@@ -1,0 +1,51 @@
+# CorpusGate services. The contract for this file is README section 8:
+# docker compose up --build on a clean machine serves the UI on :3000
+# and the API on :8000 against the committed demo corpus.
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      MODEL_BACKEND: ${MODEL_BACKEND:-local}
+      QDRANT_URL: http://vectordb:6333
+      LLM_URL: http://llm:8080
+    depends_on:
+      - vectordb
+      - llm
+
+  ui:
+    build:
+      context: .
+      dockerfile: docker/ui.Dockerfile
+    ports:
+      - "${UI_PORT:-3000}:3000"
+    depends_on:
+      - api
+
+  vectordb:
+    image: qdrant/qdrant:v1.12.4
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  # Milestone M0 stub. Milestone M2 replaces this service with the
+  # llama.cpp server image plus the quantized base model, keeping the
+  # service name and port so the API needs no change:
+  #   image: ghcr.io/ggml-org/llama.cpp:server
+  #   command: ["-m", "/models/qwen2.5-7b-instruct-q4_k_m.gguf", "--port", "8080"]
+  #   volumes: ["./models:/models"]
+  llm:
+    image: python:3.12-slim
+    command: ["python", "/stub/llm_stub.py"]
+    volumes:
+      - ./docker/llm_stub.py:/stub/llm_stub.py:ro
+    ports:
+      - "${LLM_PORT:-8080}:8080"
+
+volumes:
+  qdrant_data:
