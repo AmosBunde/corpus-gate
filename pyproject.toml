@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "corpusgate"
+version = "0.1.0"
+description = "Private corpus agent with an eval gate"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Amos Bunde" }]
+
+[project.optional-dependencies]
+serve = ["fastapi>=0.115", "uvicorn[standard]>=0.30"]
+dev = ["ruff>=0.6", "pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["corpusgate*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
