@@ -110,7 +110,7 @@ sequenceDiagram
     W-->>U: rendered cited passages
 ```
 
-The rendered, styled version of the system diagram lives in `docs/architecture.html`, and `architecture/` holds the full set of five interactive diagrams (system, query sequence, eval gate workflow, ingestion data flow, adapter lifecycle) with their JSON sources. Any PR that changes a component boundary or a tool updates the Mermaid source above, `docs/architecture.html`, and the affected diagram in `architecture/` in the same PR.
+The system diagram above is also rendered as an interactive page: [`system.html`](system.html) at the repository root, generated with Archify from `architecture/system.architecture.json` and matching the Mermaid node for node. `docs/architecture.html` carries the styled SVG overview, and `architecture/` holds the full set of five interactive diagrams (system, query sequence, eval gate workflow, ingestion data flow, adapter lifecycle) with their JSON sources. Any PR that changes a component boundary or a tool updates the Mermaid source above, the rendered pages, and the affected diagram in `architecture/` in the same PR.
 
 ## 3. Repository structure
 
