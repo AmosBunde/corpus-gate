@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "CorpusGate System Architecture",
+    "subtitle": "Private corpus agent with an eval gate. Everything inside the green boundary is self-hosted.",
+    "output": "system.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1180,
+      700
+    ],
+    "views": [
+      {
+        "id": "query-path",
+        "label": "Query path",
+        "focus": [
+          "ui",
+          "api",
+          "agent",
+          "tools",
+          "vdb",
+          "llm"
+        ],
+        "note": "A question flows from the UI through the agent loop to the local LLM runtime."
+      },
+      {
+        "id": "ingestion",
+        "label": "Ingestion",
+        "focus": [
+          "ingest",
+          "store",
+          "vdb"
+        ],
+        "note": "Filings are parsed, normalized with provenance, chunked, embedded, and loaded."
+      },
+      {
+        "id": "eval-gate",
+        "label": "Eval gate",
+        "focus": [
+          "runnerjudge",
+          "gateboard",
+          "api"
+        ],
+        "note": "Every variant is scored against the champion before promotion."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "ingest",
+      "type": "backend",
+      "label": "Ingestion",
+      "sublabel": "SEC EDGAR filings",
+      "pos": [
+        60,
+        140
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Corpus store",
+      "sublabel": "chunks + provenance",
+      "pos": [
+        60,
+        280
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "vdb",
+      "type": "database",
+      "label": "Qdrant",
+      "sublabel": "vector index",
+      "pos": [
+        60,
+        430
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "ui",
+      "type": "frontend",
+      "label": "UI",
+      "sublabel": "React :3000",
+      "pos": [
+        520,
+        100
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "API service",
+      "sublabel": "FastAPI :8000, auth",
+      "pos": [
+        520,
+        220
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "Agent loop",
+      "sublabel": "six-step budget",
+      "pos": [
+        520,
+        340
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "tools",
+      "type": "backend",
+      "label": "Tools",
+      "sublabel": "search, read, cross_ref",
+      "pos": [
+        290,
+        430
+      ],
+      "size": [
+        160,
+        60
+      ]
+    },
+    {
+      "id": "llm",
+      "type": "backend",
+      "label": "LLM runtime",
+      "sublabel": "llama.cpp, GGUF",
+      "pos": [
+        520,
+        480
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "runnerjudge",
+      "type": "security",
+      "label": "Eval runner + judge",
+      "sublabel": "pinned prompts",
+      "pos": [
+        900,
+        140
+      ],
+      "size": [
+        180,
+        60
+      ]
+    },
+    {
+      "id": "gateboard",
+      "type": "security",
+      "label": "Scoreboard + gate",
+      "sublabel": "tolerance check",
+      "pos": [
+        900,
+        280
+      ],
+      "size": [
+        180,
+        60
+      ]
+    },
+    {
+      "id": "apillm",
+      "type": "external",
+      "label": "API LLM backend",
+      "sublabel": "development only",
+      "pos": [
+        900,
+        480
+      ],
+      "size": [
+        180,
+        60
+      ],
+      "tag": "dev only"
+    },
+    {
+      "id": "gpu",
+      "type": "external",
+      "label": "GPU trainer",
+      "sublabel": "LoRA via peft, 24 GB",
+      "pos": [
+        900,
+        600
+      ],
+      "size": [
+        180,
+        60
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Self-hosted deployment boundary",
+      "wraps": [
+        "ingest",
+        "store",
+        "vdb",
+        "ui",
+        "api",
+        "agent",
+        "tools",
+        "llm"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Eval gate",
+      "wraps": [
+        "runnerjudge",
+        "gateboard"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "ingest-store",
+      "from": "ingest",
+      "to": "store",
+      "label": "normalize",
+      "labelDy": 24
+    },
+    {
+      "id": "store-vdb",
+      "from": "store",
+      "to": "vdb",
+      "label": "embed + load",
+      "labelDy": 24
+    },
+    {
+      "id": "ui-api",
+      "from": "ui",
+      "to": "api",
+      "label": "HTTPS",
+      "variant": "emphasis",
+      "labelDy": 24
+    },
+    {
+      "id": "api-agent",
+      "from": "api",
+      "to": "agent",
+      "label": "question",
+      "variant": "emphasis",
+      "labelDy": 24
+    },
+    {
+      "id": "agent-tools",
+      "from": "agent",
+      "to": "tools",
+      "label": "tool calls",
+      "variant": "emphasis"
+    },
+    {
+      "id": "tools-vdb",
+      "from": "tools",
+      "to": "vdb",
+      "label": "search",
+      "labelDy": 16
+    },
+    {
+      "id": "tools-store",
+      "from": "tools",
+      "to": "store",
+      "label": "read"
+    },
+    {
+      "id": "agent-llm",
+      "from": "agent",
+      "to": "llm",
+      "label": "completion",
+      "variant": "emphasis",
+      "labelDy": 24
+    },
+    {
+      "id": "eval-api",
+      "from": "runnerjudge",
+      "to": "api",
+      "label": "score variants",
+      "variant": "security"
+    },
+    {
+      "id": "runner-gate",
+      "from": "runnerjudge",
+      "to": "gateboard",
+      "label": "scores",
+      "variant": "security",
+      "labelDy": 24
+    },
+    {
+      "id": "agent-apillm",
+      "from": "agent",
+      "to": "apillm",
+      "label": "MODEL_BACKEND=api",
+      "variant": "dashed"
+    },
+    {
+      "id": "gpu-llm",
+      "from": "gpu",
+      "to": "llm",
+      "label": "merged adapter",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Serving",
+      "items": [
+        "React UI renders cited passages inline",
+        "FastAPI with auth, latency and token logging",
+        "Agent loop forces an answer by step six"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Data",
+      "items": [
+        "Every chunk carries provenance",
+        "Citations are chunk IDs, verified by the eval",
+        "Local embeddings, bge-small-en-v1.5"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Gate rule",
+      "items": [
+        "Overall score must beat the champion",
+        "No category may drop past the tolerance",
+        "Rejected variants are documented, never deleted"
+      ]
+    }
+  ]
+}

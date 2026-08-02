@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "CorpusGate Eval Gate",
+    "subtitle": "How a candidate variant earns promotion: scored, audited, and gated against the champion",
+    "output": "eval-gate.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "scoring",
+        "label": "Scoring",
+        "focus": [
+          "candidate",
+          "runeval",
+          "judgescore",
+          "rmetrics"
+        ],
+        "note": "The runner collects answers; the judge and the retrieval metrics score them independently."
+      },
+      {
+        "id": "audit",
+        "label": "Judge audit",
+        "focus": [
+          "judgescore",
+          "subsample",
+          "scoreboard"
+        ],
+        "note": "Fifteen questions are human scored and the agreement is reported with every full run."
+      },
+      {
+        "id": "decision",
+        "label": "Gate decision",
+        "focus": [
+          "scoreboard",
+          "gatecheck",
+          "promote",
+          "reject"
+        ],
+        "note": "Overall must beat the champion and no category may drop past the tolerance."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "variant",
+      "label": "Variant under test"
+    },
+    {
+      "id": "harness",
+      "label": "Eval harness"
+    },
+    {
+      "id": "judgelane",
+      "label": "Judge, pinned model"
+    },
+    {
+      "id": "human",
+      "label": "Human audit"
+    },
+    {
+      "id": "gate",
+      "label": "Gate"
+    },
+    {
+      "id": "rejectlane",
+      "label": "Rejection path",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "run",
+      "label": "Run",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "score",
+      "label": "Score + audit",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "decide",
+      "label": "Decide",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "security"
+    }
+  ],
+  "mainPath": [
+    "candidate",
+    "runeval",
+    "judgescore",
+    "scoreboard",
+    "gatecheck",
+    "promote"
+  ],
+  "nodes": [
+    {
+      "id": "candidate",
+      "lane": "variant",
+      "col": 0,
+      "type": "backend",
+      "label": "Candidate",
+      "sublabel": "base / rag / agent / ft"
+    },
+    {
+      "id": "runeval",
+      "lane": "harness",
+      "col": 1,
+      "type": "backend",
+      "label": "Run eval",
+      "sublabel": "50+ questions"
+    },
+    {
+      "id": "rmetrics",
+      "lane": "harness",
+      "col": 3,
+      "type": "database",
+      "label": "Retrieval metrics",
+      "sublabel": "hit rate at 5, MRR",
+      "width": 128
+    },
+    {
+      "id": "judgescore",
+      "lane": "judgelane",
+      "col": 2,
+      "type": "security",
+      "label": "Judge scoring",
+      "sublabel": "rubric, 0 to 100"
+    },
+    {
+      "id": "subsample",
+      "lane": "human",
+      "col": 1,
+      "type": "external",
+      "label": "Human subsample",
+      "sublabel": "15 questions",
+      "width": 116
+    },
+    {
+      "id": "scoreboard",
+      "lane": "gate",
+      "col": 4,
+      "type": "database",
+      "label": "Scoreboard",
+      "sublabel": "per category + overall"
+    },
+    {
+      "id": "gatecheck",
+      "lane": "gate",
+      "col": 5,
+      "type": "security",
+      "label": "Gate check",
+      "sublabel": "champion + tolerance"
+    },
+    {
+      "id": "promote",
+      "lane": "variant",
+      "col": 5,
+      "type": "cloud",
+      "label": "Promote",
+      "sublabel": "new champion"
+    },
+    {
+      "id": "reject",
+      "lane": "rejectlane",
+      "col": 5,
+      "type": "messagebus",
+      "label": "Reject",
+      "sublabel": "docs/findings entry"
+    }
+  ],
+  "edges": [
+    {
+      "id": "cand-run",
+      "from": "candidate",
+      "to": "runeval",
+      "label": "answers",
+      "variant": "emphasis"
+    },
+    {
+      "id": "run-judge",
+      "from": "runeval",
+      "to": "judgescore",
+      "label": "answer + citations",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "run-rmetrics",
+      "from": "runeval",
+      "to": "rmetrics",
+      "label": "gold chunk IDs",
+      "role": "branch",
+      "route": "straight"
+    },
+    {
+      "id": "judge-sub",
+      "from": "judgescore",
+      "to": "subsample",
+      "label": "sample 15",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "judge-board",
+      "from": "judgescore",
+      "to": "scoreboard",
+      "label": "category scores",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rmetrics-board",
+      "from": "rmetrics",
+      "to": "scoreboard",
+      "label": "independent",
+      "role": "branch"
+    },
+    {
+      "id": "sub-board",
+      "from": "subsample",
+      "to": "scoreboard",
+      "label": "agreement",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "board-gate",
+      "from": "scoreboard",
+      "to": "gatecheck",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gate-promote",
+      "from": "gatecheck",
+      "to": "promote",
+      "label": "pass",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gate-reject",
+      "from": "gatecheck",
+      "to": "reject",
+      "label": "fail",
+      "variant": "security",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Gate rule",
+      "items": [
+        "Overall score must exceed the current champion",
+        "No category may drop more than the tolerance in configs/eval.yaml",
+        "Weakening the tolerance requires explicit owner approval"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Audited judge",
+      "items": [
+        "Judge model and prompts are pinned and versioned",
+        "Every full run human scores a 15-question subsample",
+        "Judge-human agreement is published in the milestone finding"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Rejection",
+      "items": [
+        "A rejected variant is documented, never deleted",
+        "Findings record why the hypothesis failed",
+        "Retrieval quality is reported even when answers fail"
+      ]
+    }
+  ]
+}

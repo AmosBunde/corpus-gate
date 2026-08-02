@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "CorpusGate Adapter Lifecycle",
+    "subtitle": "A LoRA adapter version from curated pairs to champion, with decontamination and the gate in the path",
+    "output": "adapter.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      980,
+      680
+    ],
+    "views": [
+      {
+        "id": "training-rail",
+        "label": "Training rail",
+        "focus": [
+          "curated",
+          "decontam",
+          "training",
+          "registered",
+          "champion"
+        ],
+        "note": "Every adapter version walks the same five phases; none skips the gate."
+      },
+      {
+        "id": "gate-check",
+        "label": "Gate check",
+        "focus": [
+          "registered",
+          "gaterun",
+          "champion",
+          "rejected"
+        ],
+        "note": "The gate compares base, RAG, RAG plus agent, and RAG plus agent plus FT per category."
+      },
+      {
+        "id": "rejection-loop",
+        "label": "Rejection loop",
+        "focus": [
+          "rejected",
+          "curated",
+          "archived"
+        ],
+        "note": "A rejected version stays in the registry with its finding; revision starts a new version."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Adapter phases"
+    },
+    {
+      "id": "gatewait",
+      "label": "Eval gate"
+    },
+    {
+      "id": "recovery",
+      "label": "Revision loop"
+    },
+    {
+      "id": "terminal",
+      "label": "Registry record"
+    }
+  ],
+  "states": [
+    {
+      "id": "curated",
+      "type": "start",
+      "label": "Pairs curated",
+      "sublabel": "format, terms, refusal",
+      "lane": "main",
+      "col": 0,
+      "step": "01",
+      "tag": "no facts"
+    },
+    {
+      "id": "decontam",
+      "type": "decision",
+      "label": "Decontaminated",
+      "sublabel": "cosine 0.85 vs eval set",
+      "lane": "main",
+      "col": 1,
+      "step": "02",
+      "tag": "report"
+    },
+    {
+      "id": "training",
+      "type": "active",
+      "label": "Training",
+      "sublabel": "LoRA, peft, 24 GB GPU",
+      "lane": "main",
+      "col": 2,
+      "step": "03",
+      "tag": "running"
+    },
+    {
+      "id": "registered",
+      "type": "waiting",
+      "label": "Registered",
+      "sublabel": "hashes + manifests",
+      "lane": "main",
+      "col": 3,
+      "step": "04",
+      "tag": "versioned"
+    },
+    {
+      "id": "champion",
+      "type": "success",
+      "label": "Champion",
+      "sublabel": "merged, quantized, served",
+      "lane": "main",
+      "col": 4,
+      "step": "05",
+      "tag": "promoted"
+    },
+    {
+      "id": "gaterun",
+      "type": "waiting",
+      "label": "Gate run",
+      "sublabel": "four variants compared",
+      "lane": "gatewait",
+      "col": 1,
+      "tag": "per category"
+    },
+    {
+      "id": "rejected",
+      "type": "failure",
+      "label": "Rejected",
+      "sublabel": "finding written",
+      "lane": "recovery",
+      "col": 0,
+      "tag": "recoverable"
+    },
+    {
+      "id": "archived",
+      "type": "neutral",
+      "label": "Version retained",
+      "sublabel": "registry keeps everything",
+      "lane": "terminal",
+      "col": 0,
+      "tag": "never deleted"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "reg-gate",
+      "from": "registered",
+      "to": "gaterun",
+      "label": "make gate",
+      "variant": "security",
+      "route": "straight",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "gate-pass",
+      "from": "gaterun",
+      "to": "champion",
+      "label": "pass",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gate-fail",
+      "from": "gaterun",
+      "to": "rejected",
+      "variant": "security",
+      "route": "bottom-channel",
+      "fromSide": "bottom",
+      "toSide": "bottom"
+    },
+    {
+      "id": "reject-revise",
+      "from": "rejected",
+      "to": "curated",
+      "label": "new version",
+      "variant": "dashed"
+    },
+    {
+      "id": "reject-archive",
+      "from": "rejected",
+      "to": "archived",
+      "label": "record kept",
+      "variant": "dashed",
+      "route": "straight",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 60
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Decontamination",
+      "items": [
+        "Pairs near any eval question or answer are dropped",
+        "The report is committed with the adapter version",
+        "The adapter trains behavior, not corpus facts"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Gate in the path",
+      "items": [
+        "No adapter reaches serving without a gate run",
+        "Base, RAG, RAG plus agent, and FT compared per category",
+        "Tolerance changes require explicit owner approval"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Registry",
+      "items": [
+        "Every version keeps its config, hashes, and reports",
+        "Rejected versions stay documented in docs/findings",
+        "Revision mints a new version, it never edits history"
+      ]
+    }
+  ]
+}
