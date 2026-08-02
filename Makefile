@@ -11,6 +11,8 @@ PYTEST ?= .venv/bin/pytest
 UVICORN ?= .venv/bin/uvicorn
 MODEL_BACKEND ?= local
 VARIANT ?= current
+PORT ?= 8000
+UI_PORT ?= 3000
 
 define not_yet
 	@echo "make $(1) lands in milestone $(2); nothing ran." >&2; exit 2
@@ -73,7 +75,7 @@ finetune:
 # ---- Serving (stubbed in M0 by issue #8, completed in M5) ---------------
 
 serve:
-	MODEL_BACKEND=$(MODEL_BACKEND) $(UVICORN) corpusgate.serve.app:app --host 0.0.0.0 --port 8000
+	MODEL_BACKEND=$(MODEL_BACKEND) $(UVICORN) corpusgate.serve.app:app --host 0.0.0.0 --port $(PORT)
 
 ui:
-	cd ui && npm install && npm run dev -- --host --port 3000
+	cd ui && npm install && npm run dev -- --host --port $(UI_PORT)

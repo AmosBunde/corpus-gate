@@ -1,0 +1,13 @@
+.git
+.venv
+.pytest_cache
+.ruff_cache
+architecture
+docs
+runs
+models
+corpus/raw
+corpus/normalized
+ui/node_modules
+ui/dist
+*.gguf
