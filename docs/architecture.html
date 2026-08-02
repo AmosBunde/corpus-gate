@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CorpusGate architecture</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0d1117;
+    font-family: "JetBrains Mono", "Fira Mono", "DejaVu Sans Mono", monospace;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px; }
+  h1 { color: #e6edf3; font-size: 20px; font-weight: 600; margin: 0 0 4px 0; }
+  p.sub { color: #8b949e; font-size: 12px; margin: 0 0 20px 0; }
+  svg { width: 100%; height: auto; display: block; }
+  text { font-family: "JetBrains Mono", "Fira Mono", "DejaVu Sans Mono", monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>CorpusGate</h1>
+<p class="sub">Private corpus agent with an eval gate. Kept in sync with the Mermaid diagram in README section 2.1.</p>
+
+<svg viewBox="0 0 1140 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CorpusGate system architecture">
+
+  <!-- ===================== legend (outside all boundaries) ===================== -->
+  <g font-size="11">
+    <rect x="20" y="16" width="1100" height="40" rx="6" fill="#161b22" stroke="#30363d"/>
+    <rect x="36" y="28" width="14" height="14" rx="3" fill="#1f3d2b" stroke="#3fb950"/>
+    <text x="56" y="39" fill="#c9d1d9">serving</text>
+    <rect x="130" y="28" width="14" height="14" rx="3" fill="#1b2f4b" stroke="#58a6ff"/>
+    <text x="150" y="39" fill="#c9d1d9">agent</text>
+    <rect x="212" y="28" width="14" height="14" rx="3" fill="#3d2b16" stroke="#d29922"/>
+    <text x="232" y="39" fill="#c9d1d9">ingestion</text>
+    <rect x="318" y="28" width="14" height="14" rx="3" fill="#2b1b40" stroke="#a371f7"/>
+    <text x="338" y="39" fill="#c9d1d9">retrieval / storage</text>
+    <rect x="480" y="28" width="14" height="14" rx="3" fill="#40161c" stroke="#f85149"/>
+    <text x="500" y="39" fill="#c9d1d9">eval gate</text>
+    <rect x="586" y="28" width="14" height="14" rx="3" fill="#21262d" stroke="#8b949e"/>
+    <text x="606" y="39" fill="#c9d1d9">outside boundary (dev only)</text>
+    <line x1="810" y1="35" x2="850" y2="35" stroke="#8b949e" stroke-width="1.5"/>
+    <text x="858" y="39" fill="#c9d1d9">data flow</text>
+    <line x1="944" y1="35" x2="984" y2="35" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="5,4"/>
+    <text x="992" y="39" fill="#c9d1d9">dev-only path</text>
+  </g>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b949e"/>
+    </marker>
+  </defs>
+
+  <!-- ===================== self-hosted boundary ===================== -->
+  <rect x="20" y="80" width="700" height="560" rx="10" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="8,5"/>
+  <text x="36" y="104" fill="#3fb950" font-size="13" font-weight="600">Self-hosted deployment boundary</text>
+
+  <!-- raw corpus (outside boundary, left of ingestion, but source data) -->
+  <g>
+    <rect x="40" y="130" width="180" height="52" rx="6" fill="#3d2b16" stroke="#d29922"/>
+    <text x="130" y="152" fill="#e6edf3" font-size="12" text-anchor="middle">Raw corpus</text>
+    <text x="130" y="168" fill="#8b949e" font-size="10" text-anchor="middle">SEC EDGAR filings</text>
+  </g>
+
+  <!-- ingestion -->
+  <g>
+    <rect x="40" y="220" width="180" height="64" rx="6" fill="#3d2b16" stroke="#d29922"/>
+    <text x="130" y="244" fill="#e6edf3" font-size="12" text-anchor="middle">Ingestion pipeline</text>
+    <text x="130" y="260" fill="#8b949e" font-size="10" text-anchor="middle">parse, normalize,</text>
+    <text x="130" y="272" fill="#8b949e" font-size="10" text-anchor="middle">chunk, embed</text>
+  </g>
+
+  <!-- corpus store -->
+  <g>
+    <path d="M 40 336 a 90 10 0 0 1 180 0 v 44 a 90 10 0 0 1 -180 0 z" fill="#2b1b40" stroke="#a371f7"/>
+    <ellipse cx="130" cy="336" rx="90" ry="10" fill="#2b1b40" stroke="#a371f7"/>
+    <text x="130" y="360" fill="#e6edf3" font-size="12" text-anchor="middle">Corpus store</text>
+    <text x="130" y="374" fill="#8b949e" font-size="10" text-anchor="middle">chunks + provenance</text>
+  </g>
+
+  <!-- vector db -->
+  <g>
+    <path d="M 40 446 a 90 10 0 0 1 180 0 v 44 a 90 10 0 0 1 -180 0 z" fill="#2b1b40" stroke="#a371f7"/>
+    <ellipse cx="130" cy="446" rx="90" ry="10" fill="#2b1b40" stroke="#a371f7"/>
+    <text x="130" y="470" fill="#e6edf3" font-size="12" text-anchor="middle">Vector DB</text>
+    <text x="130" y="484" fill="#8b949e" font-size="10" text-anchor="middle">Qdrant</text>
+  </g>
+
+  <!-- ui -->
+  <g>
+    <rect x="500" y="130" width="180" height="52" rx="6" fill="#1f3d2b" stroke="#3fb950"/>
+    <text x="590" y="152" fill="#e6edf3" font-size="12" text-anchor="middle">UI</text>
+    <text x="590" y="168" fill="#8b949e" font-size="10" text-anchor="middle">React, :3000, cited passages</text>
+  </g>
+
+  <!-- api -->
+  <g>
+    <rect x="500" y="220" width="180" height="52" rx="6" fill="#1f3d2b" stroke="#3fb950"/>
+    <text x="590" y="242" fill="#e6edf3" font-size="12" text-anchor="middle">API service</text>
+    <text x="590" y="258" fill="#8b949e" font-size="10" text-anchor="middle">FastAPI, :8000, auth, logging</text>
+  </g>
+
+  <!-- agent loop -->
+  <g>
+    <rect x="500" y="310" width="180" height="64" rx="6" fill="#1b2f4b" stroke="#58a6ff"/>
+    <text x="590" y="334" fill="#e6edf3" font-size="12" text-anchor="middle">Agent loop</text>
+    <text x="590" y="350" fill="#8b949e" font-size="10" text-anchor="middle">six-step budget,</text>
+    <text x="590" y="362" fill="#8b949e" font-size="10" text-anchor="middle">forced answer, traces</text>
+  </g>
+
+  <!-- tools -->
+  <g>
+    <rect x="290" y="400" width="200" height="76" rx="6" fill="#1b2f4b" stroke="#58a6ff"/>
+    <text x="390" y="424" fill="#e6edf3" font-size="12" text-anchor="middle">Tools</text>
+    <text x="390" y="440" fill="#8b949e" font-size="10" text-anchor="middle">search_corpus</text>
+    <text x="390" y="452" fill="#8b949e" font-size="10" text-anchor="middle">read_document</text>
+    <text x="390" y="464" fill="#8b949e" font-size="10" text-anchor="middle">cross_reference</text>
+  </g>
+
+  <!-- llm runtime -->
+  <g>
+    <rect x="500" y="530" width="180" height="76" rx="6" fill="#1b2f4b" stroke="#58a6ff"/>
+    <text x="590" y="554" fill="#e6edf3" font-size="12" text-anchor="middle">LLM runtime</text>
+    <text x="590" y="570" fill="#8b949e" font-size="10" text-anchor="middle">llama.cpp server</text>
+    <text x="590" y="582" fill="#8b949e" font-size="10" text-anchor="middle">quantized base</text>
+    <text x="590" y="594" fill="#8b949e" font-size="10" text-anchor="middle">+ merged adapter</text>
+  </g>
+
+  <!-- ===================== eval gate boundary ===================== -->
+  <rect x="760" y="80" width="360" height="380" rx="10" fill="none" stroke="#f85149" stroke-width="1.5" stroke-dasharray="8,5"/>
+  <text x="776" y="104" fill="#f85149" font-size="13" font-weight="600">Eval gate</text>
+
+  <g>
+    <rect x="800" y="130" width="280" height="52" rx="6" fill="#40161c" stroke="#f85149"/>
+    <text x="940" y="152" fill="#e6edf3" font-size="12" text-anchor="middle">Eval runner</text>
+    <text x="940" y="168" fill="#8b949e" font-size="10" text-anchor="middle">evalset/questions.jsonl, 4 categories</text>
+  </g>
+  <g>
+    <rect x="800" y="212" width="130" height="64" rx="6" fill="#40161c" stroke="#f85149"/>
+    <text x="865" y="238" fill="#e6edf3" font-size="12" text-anchor="middle">Judge</text>
+    <text x="865" y="254" fill="#8b949e" font-size="10" text-anchor="middle">pinned model,</text>
+    <text x="865" y="266" fill="#8b949e" font-size="10" text-anchor="middle">human audit</text>
+  </g>
+  <g>
+    <rect x="950" y="212" width="130" height="64" rx="6" fill="#40161c" stroke="#f85149"/>
+    <text x="1015" y="238" fill="#e6edf3" font-size="12" text-anchor="middle">Retrieval</text>
+    <text x="1015" y="252" fill="#e6edf3" font-size="12" text-anchor="middle">metrics</text>
+    <text x="1015" y="266" fill="#8b949e" font-size="10" text-anchor="middle">hit rate, MRR</text>
+  </g>
+  <g>
+    <rect x="800" y="310" width="280" height="64" rx="6" fill="#40161c" stroke="#f85149"/>
+    <text x="940" y="334" fill="#e6edf3" font-size="12" text-anchor="middle">Scoreboard + gate</text>
+    <text x="940" y="350" fill="#8b949e" font-size="10" text-anchor="middle">overall up, no category drop</text>
+    <text x="940" y="362" fill="#8b949e" font-size="10" text-anchor="middle">beyond tolerance</text>
+  </g>
+
+  <!-- ===================== outside boundary (dev only) ===================== -->
+  <g>
+    <rect x="760" y="530" width="170" height="64" rx="6" fill="#21262d" stroke="#8b949e"/>
+    <text x="845" y="554" fill="#e6edf3" font-size="12" text-anchor="middle">API LLM backend</text>
+    <text x="845" y="570" fill="#8b949e" font-size="10" text-anchor="middle">MODEL_BACKEND=api</text>
+    <text x="845" y="582" fill="#8b949e" font-size="10" text-anchor="middle">development only</text>
+  </g>
+  <g>
+    <rect x="950" y="530" width="170" height="64" rx="6" fill="#21262d" stroke="#8b949e"/>
+    <text x="1035" y="554" fill="#e6edf3" font-size="12" text-anchor="middle">GPU trainer</text>
+    <text x="1035" y="570" fill="#8b949e" font-size="10" text-anchor="middle">LoRA, peft, 24 GB</text>
+    <text x="1035" y="582" fill="#8b949e" font-size="10" text-anchor="middle">registered adapter</text>
+  </g>
+
+  <!-- ===================== edges ===================== -->
+  <g stroke="#8b949e" stroke-width="1.5" fill="none" marker-end="url(#arr)">
+    <!-- raw -> ingest -->
+    <line x1="130" y1="182" x2="130" y2="216"/>
+    <!-- ingest -> store -->
+    <line x1="130" y1="284" x2="130" y2="322"/>
+    <!-- store -> vdb (ingest loads embeddings) -->
+    <line x1="130" y1="392" x2="130" y2="432"/>
+    <!-- ui -> api -->
+    <line x1="590" y1="182" x2="590" y2="216"/>
+    <!-- api -> agent -->
+    <line x1="590" y1="272" x2="590" y2="306"/>
+    <!-- agent -> tools -->
+    <line x1="520" y1="374" x2="420" y2="396"/>
+    <!-- tools -> vdb -->
+    <line x1="286" y1="452" x2="224" y2="452"/>
+    <!-- tools -> store (read_document) -->
+    <line x1="300" y1="400" x2="226" y2="366"/>
+    <!-- agent -> llm -->
+    <line x1="590" y1="374" x2="590" y2="526"/>
+    <!-- eval runner -> api (queries variants) -->
+    <line x1="796" y1="156" x2="684" y2="240"/>
+    <!-- runner -> judge -->
+    <line x1="880" y1="182" x2="870" y2="208"/>
+    <!-- runner -> retrieval metrics -->
+    <line x1="1000" y1="182" x2="1010" y2="208"/>
+    <!-- judge -> board -->
+    <line x1="865" y1="276" x2="900" y2="306"/>
+    <!-- metrics -> board -->
+    <line x1="1015" y1="276" x2="980" y2="306"/>
+    <!-- gpu -> llm runtime -->
+    <line x1="946" y1="568" x2="684" y2="568"/>
+  </g>
+  <!-- dev-only dashed edge: agent -> api llm -->
+  <g stroke="#8b949e" stroke-width="1.5" fill="none" marker-end="url(#arr)" stroke-dasharray="5,4">
+    <path d="M 680 360 C 780 400, 840 460, 845 526"/>
+  </g>
+
+  <!-- edge labels -->
+  <g font-size="10" fill="#8b949e">
+    <text x="140" y="205" >fetch</text>
+    <text x="140" y="308">provenance</text>
+    <text x="140" y="418">embeddings</text>
+    <text x="598" y="202">HTTPS + auth</text>
+    <text x="598" y="294">question</text>
+    <text x="452" y="382">tool calls</text>
+    <text x="234" y="444">search</text>
+    <text x="598" y="456">completion</text>
+    <text x="700" y="200">score variants</text>
+    <text x="742" y="560">adapter</text>
+    <text x="712" y="470">dev only</text>
+  </g>
+
+  <!-- footer note -->
+  <text x="20" y="672" fill="#8b949e" font-size="11">With MODEL_BACKEND=local, no corpus content crosses the green boundary. The eval gate decides every promotion.</text>
+  <text x="20" y="692" fill="#8b949e" font-size="11">Variants: base, RAG, RAG plus agent, RAG plus agent plus fine-tune. Champion advances only on overall gain within category tolerance.</text>
+</svg>
+</div>
+</body>
+</html>

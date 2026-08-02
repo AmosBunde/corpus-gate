@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+ui/dist/
+
+# Data and models (demo slice in corpus/demo/ is committed)
+corpus/raw/
+corpus/normalized/
+models/
+*.gguf
+
+# Run outputs (promoted scoreboards are committed explicitly)
+runs/
+
+# Environment
+.env
+.env.*
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
