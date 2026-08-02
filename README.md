@@ -19,74 +19,95 @@ This document is the contract for the project. Where code and this document disa
 
 ```mermaid
 flowchart TB
+    classDef serving fill:#1f3d2b,stroke:#3fb950,color:#e6edf3
+    classDef agentic fill:#1b2f4b,stroke:#58a6ff,color:#e6edf3
+    classDef datastore fill:#2b1b40,stroke:#a371f7,color:#e6edf3
+    classDef ingestion fill:#3d2b16,stroke:#d29922,color:#e6edf3
+    classDef evalnode fill:#40161c,stroke:#f85149,color:#e6edf3
+    classDef externalnode fill:#21262d,stroke:#8b949e,color:#c9d1d9
+
+    raw["Raw corpus<br/>SEC EDGAR filings"]:::externalnode
+
     subgraph selfhosted["Self-hosted deployment boundary"]
-        ui["UI (React, :3000)"]
-        api["API service (FastAPI, :8000)"]
-        agent["Agent loop<br/>six-step budget, forced answer"]
-        tools["Tools<br/>search_corpus / read_document / cross_reference"]
-        retrieval["Retrieval<br/>embed + rank"]
-        vdb[("Vector DB (Qdrant)")]
-        store[("Normalized corpus store<br/>chunks + provenance")]
-        llmlocal["LLM runtime (llama.cpp server)<br/>quantized base + merged adapter"]
-        ingest["Ingestion pipeline<br/>parse, normalize, chunk, embed"]
+        ui["UI<br/>React :3000, cited passages"]:::serving
+        api["API service<br/>FastAPI :8000, auth, logging"]:::serving
+        agent["Agent loop<br/>six-step budget, forced answer, traces"]:::agentic
+        tools["Tools<br/>search_corpus, read_document, cross_reference"]:::agentic
+        llm["LLM runtime<br/>llama.cpp server, quantized base + merged adapter"]:::agentic
+        ingest["Ingestion<br/>parse, normalize, chunk"]:::ingestion
+        store[("Corpus store<br/>chunks + provenance")]:::datastore
+        vdb[("Qdrant<br/>vector index")]:::datastore
     end
 
     subgraph evalgate["Eval gate"]
-        runner["Eval runner"]
-        judge["Judge (pinned model + prompts)"]
-        rmetrics["Retrieval metrics<br/>hit rate, MRR"]
-        board["Scoreboard + gate decision"]
+        runner["Eval runner<br/>50+ questions, 4 categories"]:::evalnode
+        judge["Judge<br/>pinned model + prompts"]:::evalnode
+        human["Human subsample<br/>15 questions, agreement reported"]:::evalnode
+        rmetrics["Retrieval metrics<br/>hit rate at 5, MRR"]:::evalnode
+        board["Scoreboard + gate<br/>champion + tolerance check"]:::evalnode
     end
 
-    subgraph external["Outside the boundary (development only)"]
-        apillm["API LLM backend"]
-        gpu["GPU trainer (LoRA, peft)"]
+    subgraph devonly["Outside the boundary, development only"]
+        apillm["API LLM backend"]:::externalnode
+        gpu["GPU trainer<br/>LoRA via peft, 24 GB"]:::externalnode
     end
 
-    raw["Raw corpus<br/>SEC EDGAR filings"] --> ingest
+    raw --> ingest
     ingest --> store
-    ingest --> vdb
+    store -->|embed + load| vdb
     ui --> api
     api --> agent
     agent --> tools
-    tools --> retrieval
-    retrieval --> vdb
-    tools --> store
-    agent --> llmlocal
+    tools -->|search| vdb
+    tools -->|read| store
+    agent --> llm
     agent -.->|MODEL_BACKEND=api| apillm
-    runner --> api
+    gpu -.->|merged adapter| llm
+    runner -->|score variants| api
     runner --> judge
     runner --> rmetrics
+    judge -.->|sample 15| human
     judge --> board
-    rmetrics --> board
-    gpu -->|registered adapter| llmlocal
+    rmetrics -->|independent| board
+    human -.->|agreement| board
 ```
 
 ### 2.2 Query sequence
 
 ```mermaid
 sequenceDiagram
-    participant U as User (UI)
-    participant A as API service
+    autonumber
+    actor U as User
+    participant W as UI (React :3000)
+    participant A as API (FastAPI :8000)
     participant L as Agent loop
-    participant T as Tools
-    participant V as Vector DB
-    participant M as LLM backend
+    participant M as LLM backend (local or api)
+    participant V as Qdrant
+    participant S as Corpus store
 
-    U->>A: POST /query (auth)
-    A->>L: question
-    loop up to 6 steps
+    U->>W: ask question
+    W->>A: POST /query with auth token
+    A->>L: question + step budget
+    loop up to six steps
         L->>M: reason over context
-        M-->>L: tool call or answer
-        L->>T: search_corpus / read_document / cross_reference
-        T->>V: vector search
-        V-->>T: chunks + provenance
-        T-->>L: tool result
+        M-->>L: tool call requested
+        alt search_corpus
+            L->>V: search_corpus(query)
+            V-->>L: chunks + provenance
+        else read_document
+            L->>S: read_document(doc_id)
+            S-->>L: full passage
+        else cross_reference
+            L->>V: cross_reference(claim, doc_ids)
+            V-->>L: aligned passages
+        end
     end
-    Note over L: step 6 forces an answer
-    L-->>A: answer JSON (text + chunk ID citations + trace)
-    A-->>U: streamed answer
-    U->>U: render cited passages inline
+    Note over L: step six forces an answer
+    L->>M: evidence in context
+    M-->>L: answer JSON
+    L-->>A: answer + chunk ID citations + trace
+    A-->>W: streamed answer
+    W-->>U: rendered cited passages
 ```
 
 The rendered, styled version of the system diagram lives in `docs/architecture.html`, and `architecture/` holds the full set of five interactive diagrams (system, query sequence, eval gate workflow, ingestion data flow, adapter lifecycle) with their JSON sources. Any PR that changes a component boundary or a tool updates the Mermaid source above, `docs/architecture.html`, and the affected diagram in `architecture/` in the same PR.
