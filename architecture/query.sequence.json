@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "CorpusGate Query Sequence",
+    "subtitle": "One question through the agent loop, ending in an answer with chunk ID citations",
+    "output": "query.html",
+    "quality_profile": "showcase",
+    "viewBox": [880, 860],
+    "views": [
+      { "id": "question-in", "label": "Question in", "focus": ["user", "ui", "api", "agent"], "note": "The authenticated request reaches the agent loop with its six-step budget." },
+      { "id": "tool-loop", "label": "Tool loop", "focus": ["agent", "llm", "vdb", "store"], "note": "The model requests tools; retrieval returns chunks with provenance." },
+      { "id": "cited-answer", "label": "Cited answer", "focus": ["agent", "api", "ui", "user"], "note": "The answer JSON carries chunk IDs; the UI renders the cited passages." }
+    ]
+  },
+  "participants": [
+    { "id": "user", "type": "external", "label": "User", "sublabel": "browser" },
+    { "id": "ui", "type": "frontend", "label": "UI", "sublabel": "React :3000" },
+    { "id": "api", "type": "backend", "label": "API", "sublabel": "FastAPI :8000" },
+    { "id": "agent", "type": "backend", "label": "Agent loop", "sublabel": "six-step budget" },
+    { "id": "llm", "type": "backend", "label": "LLM backend", "sublabel": "local or api" },
+    { "id": "vdb", "type": "database", "label": "Qdrant", "sublabel": "vector search" },
+    { "id": "store", "type": "database", "label": "Corpus store", "sublabel": "chunks + provenance" }
+  ],
+  "segments": [
+    { "from": 155, "to": 290, "label": "Question" },
+    { "from": 300, "to": 610, "label": "Agent loop, up to six steps" },
+    { "from": 620, "to": 760, "label": "Answer + citations" }
+  ],
+  "messages": [
+    { "id": "ask", "from": "user", "to": "ui", "y": 185, "label": "ask question", "variant": "default" },
+    { "id": "post-query", "from": "ui", "to": "api", "y": 225, "label": "POST /query (auth token)", "variant": "emphasis" },
+    { "id": "dispatch", "from": "api", "to": "agent", "y": 265, "label": "question + step budget", "variant": "emphasis" },
+    { "id": "reason-1", "from": "agent", "to": "llm", "y": 315, "label": "reason over context", "variant": "default" },
+    { "id": "toolcall", "from": "llm", "to": "agent", "y": 353, "label": "tool call requested", "variant": "return" },
+    { "id": "search", "from": "agent", "to": "vdb", "y": 398, "label": "search_corpus(query)", "variant": "emphasis" },
+    { "id": "chunks", "from": "vdb", "to": "agent", "y": 436, "label": "chunks + provenance", "variant": "return" },
+    { "id": "read", "from": "agent", "to": "store", "y": 480, "label": "read_document(doc_id)", "variant": "default" },
+    { "id": "passage", "from": "store", "to": "agent", "y": 518, "label": "full passage", "variant": "return" },
+    { "id": "reason-2", "from": "agent", "to": "llm", "y": 562, "label": "evidence in context", "variant": "default" },
+    { "id": "final", "from": "llm", "to": "agent", "y": 600, "label": "answer JSON", "variant": "return", "note": "step six forces an answer" },
+    { "id": "answer", "from": "agent", "to": "api", "y": 650, "label": "answer + chunk ID citations + trace", "variant": "return" },
+    { "id": "stream", "from": "api", "to": "ui", "y": 692, "label": "streamed answer", "variant": "return" },
+    { "id": "render", "from": "ui", "to": "user", "y": 730, "label": "render cited passages", "variant": "return" }
+  ],
+  "activations": [
+    { "participant": "ui", "from": 218, "to": 736, "type": "frontend" },
+    { "participant": "api", "from": 225, "to": 698, "type": "backend" },
+    { "participant": "agent", "from": 265, "to": 656, "type": "backend" },
+    { "participant": "llm", "from": 310, "to": 358, "type": "backend" },
+    { "participant": "llm", "from": 557, "to": 606, "type": "backend" },
+    { "participant": "vdb", "from": 393, "to": 442, "type": "database" },
+    { "participant": "store", "from": 475, "to": 524, "type": "database" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Main path",
+      "items": [
+        "UI to API to agent to LLM and back",
+        "Retrieval happens through tools, never implicitly",
+        "The response streams while citations resolve"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Budget",
+      "items": [
+        "At most six loop steps per request",
+        "Step six forces an answer, no request hangs",
+        "The full trace is captured for every request"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Citations",
+      "items": [
+        "Answers must cite chunk IDs from the store",
+        "A fabricated chunk ID is a scored failure",
+        "The UI shows the exact cited passages inline"
+      ]
+    }
+  ]
+}

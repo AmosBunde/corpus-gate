@@ -89,7 +89,7 @@ sequenceDiagram
     U->>U: render cited passages inline
 ```
 
-The rendered, styled version of the system diagram lives in `docs/architecture.html`. Any PR that changes a component boundary or a tool updates both the Mermaid source above and `docs/architecture.html` in the same PR.
+The rendered, styled version of the system diagram lives in `docs/architecture.html`, and `architecture/` holds the full set of five interactive diagrams (system, query sequence, eval gate workflow, ingestion data flow, adapter lifecycle) with their JSON sources. Any PR that changes a component boundary or a tool updates the Mermaid source above, `docs/architecture.html`, and the affected diagram in `architecture/` in the same PR.
 
 ## 3. Repository structure
 
@@ -108,6 +108,7 @@ corpus-gate/
   corpus/                  demo/ (committed slice), raw/ and normalized/ (gitignored)
   registry/                adapter versions + decontamination reports
   runs/                    eval run outputs (gitignored except promoted scoreboards)
+  architecture/            interactive diagram set (HTML + JSON sources, via Archify)
   docs/
     architecture.html      styled system diagram (kept in sync with Mermaid)
     corpus.md              corpus selection rationale (M1)

@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "CorpusGate Ingestion Data Flow",
+    "subtitle": "Messy filings become provenance-carrying chunks, vectors, and scored retrieval",
+    "output": "ingestion.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1120,
+      720
+    ],
+    "views": [
+      {
+        "id": "parse-path",
+        "label": "Parse path",
+        "focus": [
+          "edgar",
+          "parsers",
+          "normalize",
+          "chunker"
+        ],
+        "note": "Each source format gets its own parser; normalization attaches provenance to every chunk."
+      },
+      {
+        "id": "index-path",
+        "label": "Index path",
+        "focus": [
+          "chunker",
+          "embed",
+          "vdb",
+          "store"
+        ],
+        "note": "Chunks land in the corpus store; vectors land in Qdrant, always embedded locally."
+      },
+      {
+        "id": "consumers",
+        "label": "Consumers",
+        "focus": [
+          "vdb",
+          "store",
+          "retrieval",
+          "evalmetrics"
+        ],
+        "note": "The agent retrieves through tools; the eval scores retrieval independently of answers."
+      }
+    ]
+  },
+  "stages": [
+    {
+      "label": "Source"
+    },
+    {
+      "label": "Parse"
+    },
+    {
+      "label": "Normalize + chunk"
+    },
+    {
+      "label": "Store"
+    },
+    {
+      "label": "Consume"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "edgar",
+      "type": "external",
+      "label": "SEC EDGAR",
+      "sublabel": "10-K, 10-Q, 8-K",
+      "stage": 0,
+      "row": 0,
+      "tag": "public"
+    },
+    {
+      "id": "demo",
+      "type": "external",
+      "label": "Demo corpus",
+      "sublabel": "committed slice",
+      "stage": 0,
+      "row": 2
+    },
+    {
+      "id": "parsers",
+      "type": "backend",
+      "label": "Parsers",
+      "sublabel": "per source format",
+      "stage": 1,
+      "row": 1,
+      "tag": "messy in"
+    },
+    {
+      "id": "normalize",
+      "type": "backend",
+      "label": "Normalizer",
+      "sublabel": "provenance attached",
+      "stage": 2,
+      "row": 0
+    },
+    {
+      "id": "chunker",
+      "type": "backend",
+      "label": "Chunker",
+      "sublabel": "structure aware",
+      "stage": 2,
+      "row": 2
+    },
+    {
+      "id": "embed",
+      "type": "backend",
+      "label": "Embedder",
+      "sublabel": "bge-small-en-v1.5",
+      "stage": 3,
+      "row": 0,
+      "tag": "local CPU"
+    },
+    {
+      "id": "vdb",
+      "type": "database",
+      "label": "Qdrant",
+      "sublabel": "vector index",
+      "stage": 3,
+      "row": 2
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Corpus store",
+      "sublabel": "chunks + provenance",
+      "stage": 3,
+      "row": 4
+    },
+    {
+      "id": "retrieval",
+      "type": "backend",
+      "label": "Agent retrieval",
+      "sublabel": "search + read tools",
+      "stage": 4,
+      "row": 3
+    },
+    {
+      "id": "evalmetrics",
+      "type": "security",
+      "label": "Retrieval metrics",
+      "sublabel": "hit rate at 5, MRR",
+      "stage": 4,
+      "row": 1
+    }
+  ],
+  "flows": [
+    {
+      "id": "edgar-parsers",
+      "from": "edgar",
+      "to": "parsers",
+      "label": "raw filings",
+      "classification": "public documents",
+      "variant": "emphasis"
+    },
+    {
+      "id": "demo-parsers",
+      "from": "demo",
+      "to": "parsers",
+      "label": "demo slice",
+      "classification": "committed sample",
+      "variant": "dashed"
+    },
+    {
+      "id": "parsers-normalize",
+      "from": "parsers",
+      "to": "normalize",
+      "label": "parsed documents",
+      "classification": "per-format output",
+      "variant": "emphasis"
+    },
+    {
+      "id": "normalize-chunker",
+      "from": "normalize",
+      "to": "chunker",
+      "label": "clean sections",
+      "classification": "provenance kept",
+      "variant": "emphasis"
+    },
+    {
+      "id": "chunker-embed",
+      "from": "chunker",
+      "to": "embed",
+      "label": "chunks",
+      "classification": "chunk IDs minted",
+      "variant": "emphasis"
+    },
+    {
+      "id": "chunker-store",
+      "from": "chunker",
+      "to": "store",
+      "label": "chunks + provenance",
+      "classification": "source of citations"
+    },
+    {
+      "id": "embed-vdb",
+      "from": "embed",
+      "to": "vdb",
+      "label": "vectors",
+      "classification": "local embeddings",
+      "variant": "emphasis"
+    },
+    {
+      "id": "vdb-retrieval",
+      "from": "vdb",
+      "to": "retrieval",
+      "label": "top k chunks",
+      "classification": "ranked",
+      "variant": "emphasis"
+    },
+    {
+      "id": "store-retrieval",
+      "from": "store",
+      "to": "retrieval",
+      "label": "full passages",
+      "classification": "read_document"
+    },
+    {
+      "id": "vdb-evalmetrics",
+      "from": "vdb",
+      "to": "evalmetrics",
+      "label": "ranked chunk IDs",
+      "classification": "versus gold IDs",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Provenance first",
+      "items": [
+        "Every chunk records document, section, and offsets",
+        "Chunk IDs minted here are the citation currency",
+        "Structure-aware chunking follows filing sections"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Local by default",
+      "items": [
+        "Embeddings run locally on CPU",
+        "The vector index and the corpus store stay inside the boundary",
+        "The demo slice ships with the repository"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Scored independently",
+      "items": [
+        "Hit rate and MRR are computed against gold chunk IDs",
+        "Retrieval quality is reported apart from answer quality",
+        "A retrieval regression fails the gate on its own evidence"
+      ]
+    }
+  ]
+}
