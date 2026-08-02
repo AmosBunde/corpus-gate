@@ -4,7 +4,7 @@ Five interactive HTML diagrams, rendered with Archify from the JSON specificatio
 
 | Diagram | Type | Source | Shows |
 | --- | --- | --- | --- |
-| [system.html](system.html) | architecture | `system.architecture.json` | Component map with the self-hosted deployment boundary and the eval gate boundary |
+| [system.html](system.html) | architecture | `system.architecture.json` | Component map matching README 2.1 node for node, including the judge audit path; an identical copy sits at the repository root as `../system.html` |
 | [query.html](query.html) | sequence | `query.sequence.json` | One question through the agent loop, ending in an answer with chunk ID citations |
 | [eval-gate.html](eval-gate.html) | workflow | `eval-gate.workflow.json` | How a candidate variant is scored, audited, and gated against the champion |
 | [ingestion.html](ingestion.html) | dataflow | `ingestion.dataflow.json` | Filings to provenance-carrying chunks, vectors, and independently scored retrieval |

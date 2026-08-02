@@ -3,12 +3,12 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "CorpusGate System Architecture",
-    "subtitle": "Private corpus agent with an eval gate. Everything inside the green boundary is self-hosted.",
+    "subtitle": "The README section 2.1 diagram, node for node. Everything inside the green boundary is self-hosted.",
     "output": "system.html",
     "quality_profile": "showcase",
     "viewBox": [
-      1180,
-      700
+      1260,
+      780
     ],
     "views": [
       {
@@ -28,6 +28,7 @@
         "id": "ingestion",
         "label": "Ingestion",
         "focus": [
+          "raw",
           "ingest",
           "store",
           "vdb"
@@ -38,23 +39,49 @@
         "id": "eval-gate",
         "label": "Eval gate",
         "focus": [
-          "runnerjudge",
-          "gateboard",
+          "runner",
+          "judge",
+          "rmetrics",
+          "board",
           "api"
         ],
         "note": "Every variant is scored against the champion before promotion."
+      },
+      {
+        "id": "judge-audit",
+        "label": "Judge audit",
+        "focus": [
+          "judge",
+          "human",
+          "board"
+        ],
+        "note": "Fifteen questions are human scored; agreement reaches the scoreboard with every full run."
       }
     ]
   },
   "components": [
     {
-      "id": "ingest",
-      "type": "backend",
-      "label": "Ingestion",
+      "id": "raw",
+      "type": "external",
+      "label": "Raw corpus",
       "sublabel": "SEC EDGAR filings",
       "pos": [
         60,
-        140
+        40
+      ],
+      "size": [
+        150,
+        56
+      ]
+    },
+    {
+      "id": "ingest",
+      "type": "backend",
+      "label": "Ingestion",
+      "sublabel": "parse, normalize, chunk",
+      "pos": [
+        60,
+        160
       ],
       "size": [
         150,
@@ -68,7 +95,7 @@
       "sublabel": "chunks + provenance",
       "pos": [
         60,
-        280
+        300
       ],
       "size": [
         150,
@@ -82,7 +109,7 @@
       "sublabel": "vector index",
       "pos": [
         60,
-        430
+        450
       ],
       "size": [
         150,
@@ -93,13 +120,13 @@
       "id": "ui",
       "type": "frontend",
       "label": "UI",
-      "sublabel": "React :3000",
+      "sublabel": "React :3000, cited passages",
       "pos": [
         520,
-        100
+        120
       ],
       "size": [
-        150,
+        160,
         60
       ]
     },
@@ -107,13 +134,13 @@
       "id": "api",
       "type": "backend",
       "label": "API service",
-      "sublabel": "FastAPI :8000, auth",
+      "sublabel": "FastAPI :8000, auth, logging",
       "pos": [
         520,
-        220
+        240
       ],
       "size": [
-        150,
+        160,
         60
       ]
     },
@@ -121,13 +148,13 @@
       "id": "agent",
       "type": "backend",
       "label": "Agent loop",
-      "sublabel": "six-step budget",
+      "sublabel": "six-step budget, traces",
       "pos": [
         520,
-        340
+        360
       ],
       "size": [
-        150,
+        160,
         60
       ]
     },
@@ -138,7 +165,7 @@
       "sublabel": "search, read, cross_ref",
       "pos": [
         290,
-        430
+        450
       ],
       "size": [
         160,
@@ -149,10 +176,24 @@
       "id": "llm",
       "type": "backend",
       "label": "LLM runtime",
-      "sublabel": "llama.cpp, GGUF",
+      "sublabel": "llama.cpp, base + adapter",
       "pos": [
         520,
-        480
+        500
+      ],
+      "size": [
+        160,
+        60
+      ]
+    },
+    {
+      "id": "runner",
+      "type": "security",
+      "label": "Eval runner",
+      "sublabel": "50+ questions, 4 categories",
+      "pos": [
+        880,
+        110
       ],
       "size": [
         150,
@@ -160,30 +201,59 @@
       ]
     },
     {
-      "id": "runnerjudge",
+      "id": "judge",
       "type": "security",
-      "label": "Eval runner + judge",
-      "sublabel": "pinned prompts",
+      "label": "Judge",
+      "sublabel": "pinned model + prompts",
       "pos": [
-        900,
-        140
+        880,
+        230
       ],
       "size": [
-        180,
+        150,
         60
       ]
     },
     {
-      "id": "gateboard",
+      "id": "human",
       "type": "security",
-      "label": "Scoreboard + gate",
-      "sublabel": "tolerance check",
+      "label": "Human subsample",
+      "sublabel": "15 questions",
       "pos": [
-        900,
-        280
+        880,
+        350
       ],
       "size": [
-        180,
+        150,
+        60
+      ],
+      "tag": "audit"
+    },
+    {
+      "id": "rmetrics",
+      "type": "security",
+      "label": "Retrieval metrics",
+      "sublabel": "hit rate at 5, MRR",
+      "pos": [
+        1070,
+        230
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "board",
+      "type": "security",
+      "label": "Scoreboard + gate",
+      "sublabel": "champion + tolerance",
+      "pos": [
+        880,
+        470
+      ],
+      "size": [
+        220,
         60
       ]
     },
@@ -193,11 +263,11 @@
       "label": "API LLM backend",
       "sublabel": "development only",
       "pos": [
-        900,
-        480
+        730,
+        630
       ],
       "size": [
-        180,
+        170,
         60
       ],
       "tag": "dev only"
@@ -208,11 +278,11 @@
       "label": "GPU trainer",
       "sublabel": "LoRA via peft, 24 GB",
       "pos": [
-        900,
-        600
+        930,
+        630
       ],
       "size": [
-        180,
+        170,
         60
       ]
     }
@@ -236,12 +306,23 @@
       "kind": "security-group",
       "label": "Eval gate",
       "wraps": [
-        "runnerjudge",
-        "gateboard"
-      ]
+        "runner",
+        "judge",
+        "human",
+        "rmetrics",
+        "board"
+      ],
+      "pad": 36
     }
   ],
   "connections": [
+    {
+      "id": "raw-ingest",
+      "from": "raw",
+      "to": "ingest",
+      "label": "fetch",
+      "labelDy": 24
+    },
     {
       "id": "ingest-store",
       "from": "ingest",
@@ -301,33 +382,122 @@
       "labelDy": 24
     },
     {
-      "id": "eval-api",
-      "from": "runnerjudge",
-      "to": "api",
-      "label": "score variants",
-      "variant": "security"
-    },
-    {
-      "id": "runner-gate",
-      "from": "runnerjudge",
-      "to": "gateboard",
-      "label": "scores",
-      "variant": "security",
-      "labelDy": 24
-    },
-    {
       "id": "agent-apillm",
       "from": "agent",
       "to": "apillm",
       "label": "MODEL_BACKEND=api",
-      "variant": "dashed"
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "top",
+      "via": [
+        [
+          815,
+          390
+        ]
+      ],
+      "labelSegment": 1,
+      "labelDx": -52
     },
     {
       "id": "gpu-llm",
       "from": "gpu",
       "to": "llm",
       "label": "merged adapter",
-      "variant": "dashed"
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [
+        [
+          1015,
+          740
+        ],
+        [
+          600,
+          740
+        ]
+      ]
+    },
+    {
+      "id": "runner-api",
+      "from": "runner",
+      "to": "api",
+      "label": "score variants",
+      "variant": "security"
+    },
+    {
+      "id": "runner-judge",
+      "from": "runner",
+      "to": "judge",
+      "label": "answers",
+      "variant": "security",
+      "labelDy": 24
+    },
+    {
+      "id": "runner-rmetrics",
+      "from": "runner",
+      "to": "rmetrics",
+      "label": "gold IDs",
+      "variant": "security"
+    },
+    {
+      "id": "judge-human",
+      "from": "judge",
+      "to": "human",
+      "label": "sample 15",
+      "variant": "dashed",
+      "labelDy": 24
+    },
+    {
+      "id": "judge-board",
+      "from": "judge",
+      "to": "board",
+      "label": "category scores",
+      "variant": "security",
+      "fromSide": "left",
+      "toSide": "left",
+      "via": [
+        [
+          856,
+          260
+        ],
+        [
+          856,
+          500
+        ]
+      ],
+      "labelAt": [
+        845,
+        315
+      ]
+    },
+    {
+      "id": "rmetrics-board",
+      "from": "rmetrics",
+      "to": "board",
+      "label": "independent",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "right",
+      "via": [
+        [
+          1145,
+          500
+        ]
+      ],
+      "labelAt": [
+        1123,
+        544
+      ]
+    },
+    {
+      "id": "human-board",
+      "from": "human",
+      "to": "board",
+      "label": "agreement",
+      "variant": "dashed",
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
     }
   ],
   "cards": [
@@ -355,7 +525,7 @@
       "items": [
         "Overall score must beat the champion",
         "No category may drop past the tolerance",
-        "Rejected variants are documented, never deleted"
+        "Judge audited: 15 human-scored questions per full run"
       ]
     }
   ]
