@@ -1,6 +1,6 @@
 # Architecture diagrams
 
-Five self-contained interactive HTML diagrams, rendered with Archify from the JSON specifications in this directory. Each HTML file opens directly in a browser and supports theme switching, pan and zoom, search, focus, and guided views. Every diagram passed showcase validation with zero composition errors and zero warnings.
+Five interactive HTML diagrams, rendered with Archify from the JSON specifications in this directory. Each HTML file opens directly in a browser, works without network access (one optional web font loads when online; all rendering logic and data are inline), and supports theme switching, pan and zoom, search, focus, and guided views. Every diagram passed showcase validation with zero composition errors and zero warnings.
 
 | Diagram | Type | Source | Shows |
 | --- | --- | --- | --- |
