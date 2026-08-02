@@ -1,12 +1,12 @@
 # CorpusGate
 
-A Private Corpus Agent with an Eval Gate. CorpusGate ingests one messy real-world document corpus, stands up a fine-tuned plus RAG agent over it that runs entirely on infrastructure the owner controls, and proves with a scored eval harness that each added layer earned its place. Retrieval, agentic tool use, and LoRA fine-tuning are hypotheses, not assumptions. No variant is promoted unless the gate says it beat the champion.
+A private corpus agent with an eval gate. CorpusGate ingests a messy real-world document corpus, stands up a fine-tuned plus RAG agent over it that runs entirely on infrastructure the operator controls, and proves with a scored eval harness that each added layer earned its place. Retrieval, agentic tool use, and LoRA fine-tuning are hypotheses, not assumptions. No variant is promoted unless the gate says it beat the champion.
 
-This document is the contract for the project. Where code and this document disagree, one of them is a bug.
+This document is the specification the code is held to; where the two disagree, one of them has a bug.
 
 ## 1. Principles
 
-1. **The eval set is version zero.** No ingestion, chunking, or retrieval code exists before `evalset/questions.jsonl` contains 50 or more graded questions with rubrics across four categories, and `make eval` can score an arbitrary variant against it.
+1. **The eval set is version zero.** The graded question set comes before the product: `evalset/questions.jsonl` holds 50 or more graded questions with rubrics across four categories, and `make eval` scores an arbitrary variant against it, before any ingestion, chunking, or retrieval code exists.
 2. **Every layer pays rent.** Each variant (RAG, RAG plus agent, RAG plus agent plus fine-tune) is promoted only through the gate: overall score up versus the current champion, no category regressing beyond the tolerance in `configs/eval.yaml`. A rejected variant is documented in `docs/findings/`, never deleted.
 3. **Citations are structural.** The answer schema requires chunk IDs, the UI renders the actual cited passages, and the eval scores citation correctness. An uncited claim is a scored failure.
 4. **The judge is audited.** The judge model and prompts are pinned and versioned in `configs/judge.yaml`. Every full eval run includes a 15-question human-scored subsample with judge-human agreement reported in the milestone finding.
@@ -159,9 +159,9 @@ Pinned defaults, versioned in `configs/models.yaml`:
 | Judge | claude-sonnet-5, prompt version pinned in `configs/judge.yaml` |
 | Embeddings | BAAI/bge-small-en-v1.5 via sentence-transformers, always local |
 
-Changing the base model or the judge model requires explicit owner approval. Note that an API-hosted judge transmits answer text during development eval runs; a `judge.backend: local` option exists for strict environments and its agreement with the pinned judge must be reported before use.
+The base model and the judge model are pinned in configuration; swapping either one is a reviewed design decision with its own pull request, never a side effect of other work. An API-hosted judge transmits answer text during development eval runs; a `judge.backend: local` option exists for strict environments, and its agreement with the pinned judge is measured and reported before it is relied on.
 
-Hardware reality: the development machine is CPU only. Every stage except LoRA training runs on CPU with either backend. LoRA training runs on one rented 24 GB GPU session; `make finetune` is environment-agnostic and detects the device at runtime.
+CorpusGate is CPU-first: every stage except LoRA training runs on CPU with either backend. LoRA training expects a single 24 GB GPU session; `make finetune` is environment-agnostic and detects the device at runtime.
 
 ## 5. The eval gate
 
@@ -215,7 +215,7 @@ smoke:
   min_overall: null         # set once the M2 baseline exists
 ```
 
-A candidate is promoted only if its overall score exceeds the champion and no category drops more than `category_tolerance`. Weakening the tolerance to pass a variant requires explicit owner approval. Every gate decision, promotion or rejection, is recorded in `runs/` and summarized in `docs/findings/`.
+A candidate is promoted only if its overall score exceeds the champion and no category drops more than `category_tolerance`. The tolerance is part of the gate, not a tuning knob: it never loosens to let a candidate through, and any change to it is a reviewed decision of its own. Every gate decision, promotion or rejection, is recorded in `runs/` and summarized in `docs/findings/`.
 
 ## 6. Fine-tuning rules
 
@@ -227,13 +227,13 @@ A candidate is promoted only if its overall score exceeds the champion and no ca
 
 ## 7. Milestones
 
-Work proceeds milestone by milestone. A milestone starts only after the previous one is merged to main with CI green.
+Development proceeds milestone by milestone; each milestone starts only after the previous one is merged to main with CI green.
 
 | Milestone | Deliverable |
 | --- | --- |
 | **M0 Scaffold** | Package skeleton, Makefile, docker-compose with all four services stubbed (api, ui, vector db, llm runtime), CI with lint and tests. |
-| **M1 Eval set first** | Corpus selection documented in `docs/corpus.md` (public regulatory filings preferred: real, messy, unencumbered). 50+ graded questions with rubrics and reference answers. Eval runner, judge, scoreboard. Retrieval metrics scored independently. Smoke slice in CI. |
-| **M2 Ingestion and RAG baseline** | Parsers per source format, normalization with provenance per chunk, structure-aware chunking, embeddings, vector DB load, one-shot RAG answer path. First full eval score recorded: this is the number to beat. |
+| **M1 Eval set first** | Corpus selection documented in `docs/corpus.md` (public regulatory filings: real, messy, unencumbered). 50+ graded questions with rubrics and reference answers. Eval runner, judge, scoreboard. Retrieval metrics scored independently. Smoke slice in CI. |
+| **M2 Ingestion and RAG baseline** | Parsers per source format, normalization with provenance per chunk, structure-aware chunking, embeddings, vector DB load, one-shot RAG answer path. The first full eval score is recorded here and becomes the baseline every later variant must beat. |
 | **M3 Agentic layer** | Tools `search_corpus`, `read_document`, `cross_reference`. Loop with six-step budget and forced-answer fallback. Full trace capture per request. Eval re-run with per-category delta, latency, and token cost. |
 | **M4 Fine-tuning** | Curated domain pairs, LoRA training, versioned adapter, decontamination report. Gate run comparing base vs RAG vs RAG+agent vs RAG+agent+FT per category. |
 | **M5 Serving and UI** | FastAPI endpoint with auth, per-request latency and token cost logging. React UI with query box, streamed answer, inline cited source passages. Load test note and cost-per-query table in findings. |
@@ -247,7 +247,7 @@ make eval-base    # score the no-retrieval base model variant
 make rag          # build the one-shot RAG variant
 make eval         # full eval of the current variant (VARIANT=...)
 make agent        # build the agentic variant
-make finetune     # train the LoRA adapter (GPU if available, refuses politely on CPU)
+make finetune     # train the LoRA adapter (needs a GPU; exits with a clear message on CPU)
 make gate         # score all variants, render the scoreboard, apply the gate
 make smoke        # 10-question CI slice
 make serve        # API on :8000
@@ -264,13 +264,15 @@ make ui           # UI dev server on :3000
 - The canonical results table in section 11 is filled from real runs, including p50 latency and cost per query.
 - `docs/findings/` contains one written analysis per milestone, including rejected variants and judge-human agreement numbers.
 - Twenty or more issues exist, every one linked to a merged PR through a development branch, with the comment cadence of section 10 visible on each, and every experiment PR leading with its eval delta.
-- No file in the repository contains an unfilled placeholder, a contraction, or an em dash in prose.
+- Every file honors the house style stated in section 10: no unfilled placeholders, no contractions, and no em dashes in prose.
 
-## 10. GitHub workflow
+## 10. Development process
 
-The repository history is a deliverable. Every unit of work follows this cadence.
+The repository history is part of the product: every change is traceable from an issue through a linked branch to a merged pull request that carries its evidence. House style for all prose in the repository (documentation, findings, issue and PR bodies, commit messages): full forms rather than contractions, no em dashes, and no unfilled placeholders on main.
 
 ### 10.1 One-time setup: labels and milestones
+
+The labels and milestones were created once with:
 
 ```bash
 gh label create infra      --color 6e7781 --description "Scaffolding, CI, docker, tooling"
@@ -291,7 +293,7 @@ done
 
 ### 10.2 Issues
 
-Every task starts as an issue with the correct label and milestone. Experiment work uses the Hypothesis, Design, Acceptance criteria, Risks structure. Infra work uses Problem, Proposal, Acceptance criteria.
+Every task starts as an issue carrying a label and, when it belongs to one, a milestone. Experiment issues use the Hypothesis, Design, Acceptance criteria, Risks structure; infrastructure issues use Problem, Proposal, Acceptance criteria.
 
 Worked example (experiment):
 
@@ -320,7 +322,7 @@ will show whether steps are spent on distinct sub-queries.
 
 ### 10.3 Branches
 
-Create the branch from the issue so the two are linked:
+Branches are created from their issue so the two stay linked:
 
 ```bash
 gh issue develop <n> --name <type>/<n>-<slug> --checkout
@@ -329,7 +331,7 @@ gh issue develop <n> --name <type>/<n>-<slug> --checkout
 
 ### 10.4 Commits
 
-Conventional-commit subjects, why-first bodies, footer `Refs #<n>` on intermediate commits. Never put a closing keyword in a commit; the PR closes the issue.
+Commits use conventional subjects and why-first bodies, with a `Refs #<n>` footer on intermediate commits. Closing keywords stay out of commit messages; the pull request closes the issue.
 
 ```
 feat(agent): add six-step budget to the tool loop
@@ -344,7 +346,7 @@ Refs #23
 
 ### 10.5 Commit comments
 
-Where a reviewer would have to guess (storage decisions, latency tradeoffs), leave a commit comment:
+Where a reviewer would otherwise have to guess (storage decisions, latency tradeoffs), the reasoning lives in a commit comment:
 
 ```bash
 gh api repos/AmosBunde/corpus-gate/commits/<sha>/comments \
@@ -353,7 +355,7 @@ gh api repos/AmosBunde/corpus-gate/commits/<sha>/comments \
 
 ### 10.6 Pull requests
 
-The PR body contains `Closes #<n>`. Every PR that touches the agent, prompts, retrieval, or an adapter leads with the eval delta table versus the current champion:
+Pull request bodies contain `Closes #<n>`. A PR that touches the agent, prompts, retrieval, or an adapter leads with the eval delta table versus the current champion:
 
 ```
 ## Eval delta versus champion (rag-v1)
@@ -376,7 +378,7 @@ Infra PRs use Summary, What changed, How it was validated.
 
 ### 10.7 Review cadence
 
-Before merging, post a substantive self-review comment on the PR, grounded in traces or measurements:
+Every pull request receives a substantive self-review comment before merge, grounded in traces or measurements:
 
 ```
 Self-review: read 12 of the 50 traces. The loop spends its extra budget on distinct
@@ -386,14 +388,14 @@ The lookup regression of 0.8 is within tolerance and traces show it comes from
 latency-driven truncation in one long filing, not from retrieval quality.
 ```
 
-After merging, post a closing comment on the issue stating whether the hypothesis held:
+After merge, the issue receives a closing comment stating whether the hypothesis held:
 
 ```
 Hypothesis held: cross_reference +8.9 (target +5). Promoted agent-v1 to champion.
 Residual issue: redundant second searches on rephrased queries, tracked in #31.
 ```
 
-Merge only with CI green, including the smoke-slice eval where applicable. Squash-merge with the PR title as the commit subject.
+Merges happen only with CI green, including the smoke-slice eval where applicable, and are squashed with the PR title as the commit subject.
 
 ## 11. Canonical results
 
