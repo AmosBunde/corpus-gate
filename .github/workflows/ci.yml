@@ -1,0 +1,47 @@
+# CorpusGate CI. The contract is README section 10: merge only with CI
+# green, including the smoke-slice eval where applicable.
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Ruff
+        run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Pytest
+        run: pytest
+
+  compose-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate compose file
+        run: docker compose config -q
+
+  # M1 attachment point: a smoke job runs the 10-question smoke slice
+  # (make smoke) against the current variant on every PR that touches
+  # the agent, prompts, retrieval, or an adapter. It lands with the
+  # eval harness in milestone M1 as a new job named smoke, and merging
+  # becomes conditional on it alongside lint and test.
