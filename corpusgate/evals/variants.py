@@ -29,6 +29,7 @@ class VariantAnswer:
     answer: str
     citations: list[Citation] = field(default_factory=list)
     refused: bool = False
+    retrieved: list[str] = field(default_factory=list)
     prompt_tokens: int = 0
     completion_tokens: int = 0
 
@@ -64,6 +65,7 @@ class OracleVariant:
             answer=question["reference_answer"],
             citations=citations,
             refused=question["category"] == "refusal",
+            retrieved=list(question["gold_anchors"]),
         )
 
 

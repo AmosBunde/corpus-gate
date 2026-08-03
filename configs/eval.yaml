@@ -1,0 +1,12 @@
+# The gate configuration from README section 5.4. The tolerance is part of
+# the gate, not a tuning knob: it never loosens to let a candidate through,
+# and any change here is a reviewed decision of its own.
+gate:
+  champion: null # set by the first full run at M2
+  category_tolerance: 2.0 # max allowed per-category drop, 0 to 100 scale
+  require_overall_gain: true
+smoke:
+  min_overall: null # set once the M2 baseline exists; until then the smoke
+  # job enforces the harness brackets (oracle ceiling, echo floor)
+retrieval:
+  hit_at: 5

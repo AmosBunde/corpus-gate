@@ -21,7 +21,7 @@ endef
 
 .PHONY: venv install lint format test \
         eval-set ingest eval-base rag eval agent finetune gate smoke \
-        judge agreement fetch-corpus serve ui
+        judge agreement scoreboard fetch-corpus serve ui
 
 venv:
 	python3 -m venv .venv
@@ -49,19 +49,22 @@ eval:
 	$(PYTHON) -m corpusgate.evals.judge score --run latest $(if $(JUDGE_BACKEND),--backend $(JUDGE_BACKEND),)
 
 smoke:
-	$(call not_yet,smoke,M1)
+	$(PYTHON) -m corpusgate.evals.smoke
 
 eval-base:
 	$(call not_yet,eval-base,M2)
 
 gate:
-	$(call not_yet,gate,M2)
+	$(call not_yet,gate,M4)
 
 judge:
 	$(PYTHON) -m corpusgate.evals.judge score --run $(RUN) $(if $(JUDGE_BACKEND),--backend $(JUDGE_BACKEND),)
 
 agreement:
 	$(PYTHON) -m corpusgate.evals.judge agreement --run $(RUN)
+
+scoreboard:
+	$(PYTHON) -m corpusgate.evals.scoreboard
 
 # ---- Ingestion and variants (milestones M2 to M4) -----------------------
 
