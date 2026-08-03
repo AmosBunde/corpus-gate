@@ -1,0 +1,216 @@
+{
+  "note": "Filings pinned by accession number so acquisition is reproducible. Selection rationale lives in docs/corpus.md.",
+  "user_agent_note": "Set SEC_USER_AGENT to your contact per SEC fair-access policy",
+  "documents": [
+    {
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "10-Q",
+      "accession": "0000320193-26-000020",
+      "primary_document": "aapl-20260627.htm",
+      "filing_date": "2026-07-31",
+      "description": "10-Q"
+    },
+    {
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "8-K",
+      "accession": "0000320193-26-000018",
+      "primary_document": "aapl-20260730.htm",
+      "filing_date": "2026-07-30",
+      "description": "8-K"
+    },
+    {
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "10-Q",
+      "accession": "0000320193-26-000013",
+      "primary_document": "aapl-20260328.htm",
+      "filing_date": "2026-05-01",
+      "description": "10-Q"
+    },
+    {
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "8-K",
+      "accession": "0000320193-26-000011",
+      "primary_document": "aapl-20260430.htm",
+      "filing_date": "2026-04-30",
+      "description": "8-K"
+    },
+    {
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "8-K",
+      "accession": "0001140361-26-015711",
+      "primary_document": "ef20071035_8k.htm",
+      "filing_date": "2026-04-20",
+      "description": "8-K"
+    },
+    {
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "DEF 14A",
+      "accession": "0001308179-26-000008",
+      "primary_document": "aapl014016-def14a.htm",
+      "filing_date": "2026-01-08",
+      "description": "DEFINITIVE PROXY STATEMENT"
+    },
+    {
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "10-K",
+      "accession": "0000320193-25-000079",
+      "primary_document": "aapl-20250927.htm",
+      "filing_date": "2025-10-31",
+      "description": "10-K"
+    },
+    {
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "10-Q",
+      "accession": "0001628280-26-050503",
+      "primary_document": "ko-20260703.htm",
+      "filing_date": "2026-07-29",
+      "description": "10-Q"
+    },
+    {
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "8-K",
+      "accession": "0001628280-26-049922",
+      "primary_document": "ko-20260728.htm",
+      "filing_date": "2026-07-28",
+      "description": "8-K"
+    },
+    {
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "8-K",
+      "accession": "0001628280-26-048466",
+      "primary_document": "ko-20260716.htm",
+      "filing_date": "2026-07-16",
+      "description": "8-K"
+    },
+    {
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "8-K",
+      "accession": "0001552781-26-000366",
+      "primary_document": "e26287_ko-8k.htm",
+      "filing_date": "2026-06-25",
+      "description": ""
+    },
+    {
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "10-Q",
+      "accession": "0001628280-26-028802",
+      "primary_document": "ko-20260403.htm",
+      "filing_date": "2026-04-30",
+      "description": "10-Q"
+    },
+    {
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "DEF 14A",
+      "accession": "0001104659-26-028215",
+      "primary_document": "ko-20260429xdef14a.htm",
+      "filing_date": "2026-03-16",
+      "description": "DEF 14A"
+    },
+    {
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "10-K",
+      "accession": "0001628280-26-010047",
+      "primary_document": "ko-20251231.htm",
+      "filing_date": "2026-02-20",
+      "description": "10-K"
+    },
+    {
+      "issuer": "Ford Motor Company",
+      "ticker": "F",
+      "cik": "37996",
+      "form": "10-Q",
+      "accession": "0000037996-26-000156",
+      "primary_document": "f-20260630.htm",
+      "filing_date": "2026-07-29",
+      "description": "10-Q"
+    },
+    {
+      "issuer": "Ford Motor Company",
+      "ticker": "F",
+      "cik": "37996",
+      "form": "8-K",
+      "accession": "0000037996-26-000155",
+      "primary_document": "f-20260728.htm",
+      "filing_date": "2026-07-28",
+      "description": "8-K"
+    },
+    {
+      "issuer": "Ford Motor Company",
+      "ticker": "F",
+      "cik": "37996",
+      "form": "8-K",
+      "accession": "0000037996-26-000151",
+      "primary_document": "f-20260702.htm",
+      "filing_date": "2026-07-02",
+      "description": "8-K"
+    },
+    {
+      "issuer": "Ford Motor Company",
+      "ticker": "F",
+      "cik": "37996",
+      "form": "8-K",
+      "accession": "0000037996-26-000093",
+      "primary_document": "f-20260520.htm",
+      "filing_date": "2026-05-21",
+      "description": "8-K"
+    },
+    {
+      "issuer": "Ford Motor Company",
+      "ticker": "F",
+      "cik": "37996",
+      "form": "10-Q",
+      "accession": "0000037996-26-000086",
+      "primary_document": "f-20260331.htm",
+      "filing_date": "2026-04-30",
+      "description": "10-Q"
+    },
+    {
+      "issuer": "Ford Motor Company",
+      "ticker": "F",
+      "cik": "37996",
+      "form": "DEF 14A",
+      "accession": "0001552781-26-000164",
+      "primary_document": "e26003_f-def14a.htm",
+      "filing_date": "2026-03-27",
+      "description": ""
+    },
+    {
+      "issuer": "Ford Motor Company",
+      "ticker": "F",
+      "cik": "37996",
+      "form": "10-K",
+      "accession": "0000037996-26-000015",
+      "primary_document": "f-20251231.htm",
+      "filing_date": "2026-02-11",
+      "description": "10-K"
+    }
+  ]
+}

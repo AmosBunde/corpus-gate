@@ -58,7 +58,7 @@ gate:
 # ---- Ingestion and variants (milestones M2 to M4) -----------------------
 
 fetch-corpus:
-	$(call not_yet,fetch-corpus,M2)
+	$(PYTHON) -m corpusgate.ingest.fetch --manifest corpus/manifest.json --dest corpus/raw
 
 ingest:
 	$(call not_yet,ingest,M2)
