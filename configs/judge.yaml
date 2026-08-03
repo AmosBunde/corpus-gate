@@ -1,0 +1,11 @@
+# The pinned judge. Changing the model or the prompt version is a reviewed
+# design decision with its own pull request, never a side effect: scores are
+# only comparable across runs while these values hold still.
+judge:
+  backend: api # api | mock; mock is deterministic and exists for tests and CI only
+  model: claude-sonnet-5
+  prompt_version: 1
+  max_tokens: 1024
+human_audit:
+  subsample_size: 15
+  pass_threshold: 60 # a score at or above this counts as a pass when computing agreement
