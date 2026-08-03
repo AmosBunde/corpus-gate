@@ -31,3 +31,11 @@ The audit protocol is implemented end to end: deterministic blind subsample, sco
 - Judging inline during the answer run was rejected: separating collection from scoring makes re-judging free, which matters as soon as a judge prompt revision or a re-audit is needed against API-priced variants.
 - A temperature-zero judge was the original design and was rejected by reality: the pinned model does not accept the parameter. The replacement (pins plus structured outputs) is stronger.
 - Running the live judge in the CI smoke slice was rejected for now: CI has no key, and a smoke job that proves the machinery mechanically on every PR is worth more than one that silently skips when a secret is absent.
+
+## Addendum: the corpus pivot (2026-08-04)
+
+After M1 first closed, the owner pinned the corpus to public commercial contracts: CUAD (CC BY 4.0) supplemented with SEC EDGAR exhibit 10 material contracts. The original selection of general EDGAR filings was therefore an unapproved substitution and was retired. The realignment ran as three green-CI units (#38 acquisition, #39 lookup and refusal re-authoring, #40 cross-reference and synthesis re-authoring plus legacy retirement), with the harness untouched throughout: schema, runner, judge, metrics, scoreboard, and smoke needed no changes, which is the eval-first architecture paying rent.
+
+What the contracts corpus improved: redacted confidential terms and incompletely dated filings give refusal and lookup questions discriminators the filings corpus never had, since a candidate that invents a redacted figure now fails on a question designed to catch exactly that. One style exception is on record: the sponsorship agreement names the campaign National Get Fit Don't Sit Day, and the quoted proper name keeps its contraction because accuracy to source text outranks house style for quoted material.
+
+Two process lessons joined the ledger. A pipeline's exit code is the last command's, so piping pytest through head masked six failing tests and a PR opened red until CI caught it; validation commands now run bare. And git add -A swept an 18 MB downloaded archive into a commit moments after a fetch step wrote it; explicit paths are the rule after any step that writes large artifacts.

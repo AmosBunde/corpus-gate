@@ -18,7 +18,7 @@ def valid_question(**overrides) -> dict:
         "question": "What were total net sales?",
         "reference_answer": "A number.",
         "rubric": ["States the number"],
-        "gold_anchors": ["AAPL-10-K-2025-10-31#item-7"],
+        "gold_anchors": ["CUAD-DISTRIBUTOR#section-6.9"],
         "smoke": False,
     }
     q.update(overrides)
@@ -65,7 +65,7 @@ def test_unknown_category_fails(known_docs: set[str]) -> None:
 
 
 def test_anchor_must_reference_a_manifest_document(known_docs: set[str]) -> None:
-    q = valid_question(gold_anchors=["MSFT-10-K-2025-06-30#item-7"])
+    q = valid_question(gold_anchors=["MSFT-MSA-2025#section-1"])
     errors = schema.validate_question(q, known_docs)
     assert any("not in corpus/manifest.json" in e for e in errors)
 
