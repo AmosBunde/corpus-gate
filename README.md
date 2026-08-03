@@ -268,28 +268,29 @@ make ui           # UI dev server on :3000
 
 ## 10. Development process
 
-The repository history is part of the product: every change is traceable from an issue through a linked branch to a merged pull request that carries its evidence. House style for all prose in the repository (documentation, findings, issue and PR bodies, commit messages): full forms rather than contractions, no em dashes, and no unfilled placeholders on main.
+The repository history is part of the product: every change is traceable from an issue through a linked branch to a merged pull request that carries its evidence. One issue maps to one branch and one pull request. A PR targets roughly 150 to 400 reviewable changed lines, where lockfiles, UI build artifacts, and eval run outputs do not count; an issue that would exceed the budget is split before work starts. House style for all prose in the repository (documentation, findings, issue and PR bodies, commit messages): full forms rather than contractions, no em dashes, and no unfilled placeholders on main.
 
 ### 10.1 One-time setup: labels and milestones
 
 The labels and milestones were created once with:
 
 ```bash
-gh label create infra      --color 6e7781 --description "Scaffolding, CI, docker, tooling"
-gh label create evalset    --color 5319e7 --description "Eval set, judge, scoreboard, gate"
-gh label create ingestion  --color d93f0b --description "Parsers, normalization, chunking"
-gh label create retrieval  --color 0e8a16 --description "Embeddings, vector DB, search"
-gh label create agent      --color 1d76db --description "Tools, loop, traces"
-gh label create finetune   --color b60205 --description "Pairs, LoRA, registry, decontamination"
-gh label create serving    --color 0052cc --description "API, auth, UI, deployment"
-gh label create experiment --color fbca04 --description "Hypothesis-driven change, gated by eval"
-gh label create finding    --color c2e0c6 --description "Written analysis in docs/findings"
+gh label create "type:infra"     --color 6e7781 --description "Scaffolding, CI, docker, tooling"
+gh label create "phase:evalset"  --color 5319e7 --description "M1: eval set, judge, scoreboard"
+gh label create "phase:ingest"   --color d93f0b --description "M2: parsers, chunking, embeddings, RAG"
+gh label create "phase:agent"    --color 1d76db --description "M3: tools, loop, traces"
+gh label create "phase:finetune" --color b60205 --description "M4: curation, LoRA, registry, gate"
+gh label create "phase:serve"    --color 0052cc --description "M5: API, UI, latency, cost"
+gh label create "exp"            --color fbca04 --description "Experiment PR: leads with the eval delta table"
+gh label create finding          --color c2e0c6 --description "Written analysis in docs/findings"
 
 for t in "M0 Scaffold" "M1 Eval set" "M2 Ingestion and RAG baseline" \
          "M3 Agentic layer" "M4 Fine-tuning" "M5 Serving and UI"; do
   gh api repos/AmosBunde/corpus-gate/milestones -f title="$t"
 done
 ```
+
+M0-era issues carry an earlier label set (infra, evalset, and peers); those labels remain on the historical issues and the scheme above applies from M1 onward.
 
 ### 10.2 Issues
 
@@ -322,7 +323,7 @@ will show whether steps are spent on distinct sub-queries.
 
 ### 10.3 Branches
 
-Branches are created from their issue so the two stay linked:
+Branches are created from their issue so the two stay linked. Branch types are `chore` (infrastructure and process), `feat` (product capability), `exp` (gate-facing experiment), and `fix` (defect repair):
 
 ```bash
 gh issue develop <n> --name <type>/<n>-<slug> --checkout
