@@ -1,5 +1,5 @@
 {
-  "note": "Filings pinned by accession number so acquisition is reproducible. Selection rationale lives in docs/corpus.md.",
+  "note": "The pinned corpus is public commercial contracts: a CUAD subset plus direct SEC EDGAR exhibit 10 material contracts. Selection rationale and licensing live in docs/corpus.md. Legacy filing entries remain until the eval set re-authoring lands (issues #39, #40) and are marked legacy: true.",
   "user_agent_note": "Set SEC_USER_AGENT to your contact per SEC fair-access policy",
   "documents": [
     {
@@ -10,7 +10,8 @@
       "accession": "0000320193-26-000020",
       "primary_document": "aapl-20260627.htm",
       "filing_date": "2026-07-31",
-      "description": "10-Q"
+      "description": "10-Q",
+      "legacy": true
     },
     {
       "issuer": "Apple Inc.",
@@ -20,7 +21,8 @@
       "accession": "0000320193-26-000018",
       "primary_document": "aapl-20260730.htm",
       "filing_date": "2026-07-30",
-      "description": "8-K"
+      "description": "8-K",
+      "legacy": true
     },
     {
       "issuer": "Apple Inc.",
@@ -30,7 +32,8 @@
       "accession": "0000320193-26-000013",
       "primary_document": "aapl-20260328.htm",
       "filing_date": "2026-05-01",
-      "description": "10-Q"
+      "description": "10-Q",
+      "legacy": true
     },
     {
       "issuer": "Apple Inc.",
@@ -40,7 +43,8 @@
       "accession": "0000320193-26-000011",
       "primary_document": "aapl-20260430.htm",
       "filing_date": "2026-04-30",
-      "description": "8-K"
+      "description": "8-K",
+      "legacy": true
     },
     {
       "issuer": "Apple Inc.",
@@ -50,7 +54,8 @@
       "accession": "0001140361-26-015711",
       "primary_document": "ef20071035_8k.htm",
       "filing_date": "2026-04-20",
-      "description": "8-K"
+      "description": "8-K",
+      "legacy": true
     },
     {
       "issuer": "Apple Inc.",
@@ -60,7 +65,8 @@
       "accession": "0001308179-26-000008",
       "primary_document": "aapl014016-def14a.htm",
       "filing_date": "2026-01-08",
-      "description": "DEFINITIVE PROXY STATEMENT"
+      "description": "DEFINITIVE PROXY STATEMENT",
+      "legacy": true
     },
     {
       "issuer": "Apple Inc.",
@@ -70,7 +76,8 @@
       "accession": "0000320193-25-000079",
       "primary_document": "aapl-20250927.htm",
       "filing_date": "2025-10-31",
-      "description": "10-K"
+      "description": "10-K",
+      "legacy": true
     },
     {
       "issuer": "The Coca-Cola Company",
@@ -80,7 +87,8 @@
       "accession": "0001628280-26-050503",
       "primary_document": "ko-20260703.htm",
       "filing_date": "2026-07-29",
-      "description": "10-Q"
+      "description": "10-Q",
+      "legacy": true
     },
     {
       "issuer": "The Coca-Cola Company",
@@ -90,7 +98,8 @@
       "accession": "0001628280-26-049922",
       "primary_document": "ko-20260728.htm",
       "filing_date": "2026-07-28",
-      "description": "8-K"
+      "description": "8-K",
+      "legacy": true
     },
     {
       "issuer": "The Coca-Cola Company",
@@ -100,7 +109,8 @@
       "accession": "0001628280-26-048466",
       "primary_document": "ko-20260716.htm",
       "filing_date": "2026-07-16",
-      "description": "8-K"
+      "description": "8-K",
+      "legacy": true
     },
     {
       "issuer": "The Coca-Cola Company",
@@ -110,7 +120,8 @@
       "accession": "0001552781-26-000366",
       "primary_document": "e26287_ko-8k.htm",
       "filing_date": "2026-06-25",
-      "description": ""
+      "description": "",
+      "legacy": true
     },
     {
       "issuer": "The Coca-Cola Company",
@@ -120,7 +131,8 @@
       "accession": "0001628280-26-028802",
       "primary_document": "ko-20260403.htm",
       "filing_date": "2026-04-30",
-      "description": "10-Q"
+      "description": "10-Q",
+      "legacy": true
     },
     {
       "issuer": "The Coca-Cola Company",
@@ -130,7 +142,8 @@
       "accession": "0001104659-26-028215",
       "primary_document": "ko-20260429xdef14a.htm",
       "filing_date": "2026-03-16",
-      "description": "DEF 14A"
+      "description": "DEF 14A",
+      "legacy": true
     },
     {
       "issuer": "The Coca-Cola Company",
@@ -140,7 +153,8 @@
       "accession": "0001628280-26-010047",
       "primary_document": "ko-20251231.htm",
       "filing_date": "2026-02-20",
-      "description": "10-K"
+      "description": "10-K",
+      "legacy": true
     },
     {
       "issuer": "Ford Motor Company",
@@ -150,7 +164,8 @@
       "accession": "0000037996-26-000156",
       "primary_document": "f-20260630.htm",
       "filing_date": "2026-07-29",
-      "description": "10-Q"
+      "description": "10-Q",
+      "legacy": true
     },
     {
       "issuer": "Ford Motor Company",
@@ -160,7 +175,8 @@
       "accession": "0000037996-26-000155",
       "primary_document": "f-20260728.htm",
       "filing_date": "2026-07-28",
-      "description": "8-K"
+      "description": "8-K",
+      "legacy": true
     },
     {
       "issuer": "Ford Motor Company",
@@ -170,7 +186,8 @@
       "accession": "0000037996-26-000151",
       "primary_document": "f-20260702.htm",
       "filing_date": "2026-07-02",
-      "description": "8-K"
+      "description": "8-K",
+      "legacy": true
     },
     {
       "issuer": "Ford Motor Company",
@@ -180,7 +197,8 @@
       "accession": "0000037996-26-000093",
       "primary_document": "f-20260520.htm",
       "filing_date": "2026-05-21",
-      "description": "8-K"
+      "description": "8-K",
+      "legacy": true
     },
     {
       "issuer": "Ford Motor Company",
@@ -190,7 +208,8 @@
       "accession": "0000037996-26-000086",
       "primary_document": "f-20260331.htm",
       "filing_date": "2026-04-30",
-      "description": "10-Q"
+      "description": "10-Q",
+      "legacy": true
     },
     {
       "issuer": "Ford Motor Company",
@@ -200,7 +219,8 @@
       "accession": "0001552781-26-000164",
       "primary_document": "e26003_f-def14a.htm",
       "filing_date": "2026-03-27",
-      "description": ""
+      "description": "",
+      "legacy": true
     },
     {
       "issuer": "Ford Motor Company",
@@ -210,7 +230,143 @@
       "accession": "0000037996-26-000015",
       "primary_document": "f-20251231.htm",
       "filing_date": "2026-02-11",
-      "description": "10-K"
+      "description": "10-K",
+      "legacy": true
+    },
+    {
+      "doc_id": "CUAD-DISTRIBUTOR",
+      "source": "cuad",
+      "title": "LIMEENERGYCO_09_09_1999-EX-10-DISTRIBUTOR AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-SUPPLY",
+      "source": "cuad",
+      "title": "ReynoldsConsumerProductsInc_20191115_S-1_EX-10.18_11896469_EX-10.18_Supply Agreement"
+    },
+    {
+      "doc_id": "CUAD-LICENSE",
+      "source": "cuad",
+      "title": "ChinaRealEstateInformationCorp_20090929_F-1_EX-10.32_4771615_EX-10.32_Content License Agreement"
+    },
+    {
+      "doc_id": "CUAD-HOSTING",
+      "source": "cuad",
+      "title": "CORIOINC_07_20_2000-EX-10.5-LICENSE AND HOSTING AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-ENDORSEMENT",
+      "source": "cuad",
+      "title": "ADAMSGOLFINC_03_21_2005-EX-10.17-ENDORSEMENT AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-JOINTVENTURE",
+      "source": "cuad",
+      "title": "BORROWMONEYCOM,INC_06_11_2020-EX-10.1-JOINT VENTURE AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-FRANCHISE",
+      "source": "cuad",
+      "title": "AIRTECHINTERNATIONALGROUPINC_05_08_2000-EX-10.4-FRANCHISE AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-AGENCY",
+      "source": "cuad",
+      "title": "AMERICANPHYSICIANSCAPITALINC_03_31_2003-EX-10.26-AGENCY AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-OUTSOURCING",
+      "source": "cuad",
+      "title": "ASPIRITYHOLDINGSLLC_05_07_2012-EX-10.6-OUTSOURCING AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-MAINTENANCE",
+      "source": "cuad",
+      "title": "ON2TECHNOLOGIES,INC_11_17_2006-EX-10.3-SUPPORT AND MAINTENANCE AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-SPONSORSHIP",
+      "source": "cuad",
+      "title": "FreezeTagInc_20180411_8-K_EX-10.1_11139603_EX-10.1_Sponsorship Agreement"
+    },
+    {
+      "doc_id": "CUAD-MANUFACTURING",
+      "source": "cuad",
+      "title": "Zounds Hearing, Inc. - MANUFACTURING DESIGN MARKETING AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-SERVICES",
+      "source": "cuad",
+      "title": "ABILITYINC_06_15_2020-EX-4.25-SERVICES AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-ALLIANCE",
+      "source": "cuad",
+      "title": "FTENETWORKS,INC_02_18_2016-EX-99.4-STRATEGIC ALLIANCE AGREEMENT"
+    },
+    {
+      "doc_id": "CUAD-COBRANDING",
+      "source": "cuad",
+      "title": "ImpresseCorp_20000322_S-1A_EX-10.11_5199234_EX-10.11_Co-Branding Agreement"
+    },
+    {
+      "doc_id": "CUAD-PROMOTION",
+      "source": "cuad",
+      "title": "WHITESMOKE,INC_11_08_2011-EX-10.26-PROMOTION AND DISTRIBUTION AGREEMENT"
+    },
+    {
+      "doc_id": "AAPL-EX-10-1-2026-02-24",
+      "source": "edgar",
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "EX-10.1",
+      "accession": "0001140361-26-006577",
+      "primary_document": "ef20060722_ex10-1.htm",
+      "filing_date": "2026-02-24",
+      "description": "exhibit 10 material contract"
+    },
+    {
+      "doc_id": "AAPL-EX-10-2-2026-02-24-B",
+      "source": "edgar",
+      "issuer": "Apple Inc.",
+      "ticker": "AAPL",
+      "cik": "320193",
+      "form": "EX-10.2",
+      "accession": "0001140361-26-006577",
+      "primary_document": "ef20065677_ex10-2.htm",
+      "filing_date": "2026-02-24",
+      "description": "exhibit 10 material contract"
+    },
+    {
+      "doc_id": "KO-EX-10-1-2026-06-25",
+      "source": "edgar",
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "EX-10.1",
+      "accession": "0001552781-26-000366",
+      "primary_document": "e26287_ex10-1.htm",
+      "filing_date": "2026-06-25",
+      "description": "exhibit 10 material contract"
+    },
+    {
+      "doc_id": "KO-EX-10-1-2026-07-29",
+      "source": "edgar",
+      "issuer": "The Coca-Cola Company",
+      "ticker": "KO",
+      "cik": "21344",
+      "form": "EX-10.1",
+      "accession": "0001628280-26-050503",
+      "primary_document": "a20260703ex-101.htm",
+      "filing_date": "2026-07-29",
+      "description": "exhibit 10 material contract"
     }
-  ]
+  ],
+  "cuad": {
+    "url": "https://github.com/TheAtticusProject/cuad/raw/main/data.zip",
+    "sha256": "f8161d18bea4e9c05e78fa6dda61c19c846fb8087ea969c172753bc2f45b999a",
+    "member": "CUADv1.json",
+    "license": "CC BY 4.0",
+    "attribution": "CUAD v1, The Atticus Project (Hendrycks et al., 2021)"
+  }
 }

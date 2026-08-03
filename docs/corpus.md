@@ -1,44 +1,62 @@
 # Corpus selection
 
-The corpus is a pinned set of 21 SEC EDGAR filings from three issuers across three industries. Selection happened before any ingestion code was written, because the eval set (milestone M1) is authored against these documents and the eval set comes first.
+The pinned corpus is public commercial contracts: a 16-contract subset of CUAD supplemented with 4 exhibit 10 material contracts fetched directly from SEC EDGAR, 20 documents total. The owner pinned this corpus on 2026-08-04; substituting another corpus requires owner approval. An earlier corpus of general EDGAR filings was selected before the pin existed; its manifest entries are retained temporarily (marked `legacy: true`) until the eval set re-authoring lands in issues #39 and #40, after which they are removed.
 
-## Why SEC EDGAR
+## Why commercial contracts
 
-- **Real.** These are the actual disclosure documents of public companies, produced under regulatory deadline pressure by different legal and finance teams with different tooling. Nothing about them was prepared for machine consumption beyond what the SEC mandates.
-- **Messy.** The primary documents are inline-XBRL HTML: deeply nested tables, tagged financial facts interleaved with narrative, page-break artifacts, and structure that differs by issuer, by form type, and by filing agent. The same logical section (risk factors, MD&A) is laid out differently in every document. File sizes in this corpus run from 32 KB (an 8-K) to 5.7 MB (a proxy statement), which forces the M2 chunker to be genuinely structure aware rather than length based.
-- **Unencumbered.** EDGAR filings are public records; the SEC states that submitted filings are not subject to copyright protection. They can be committed, quoted, and republished in findings without clearance.
+- **Real.** Every document is an actual agreement between real parties, filed as a material contract exhibit or collected by CUAD from such filings. Nothing was prepared for machine consumption.
+- **Messy.** The CUAD texts carry OCR-era artifacts, inconsistent numbering, ALL-CAPS headings, and wildly varying drafting styles across 16 agreement types. The direct EDGAR exhibits are modern inline-XBRL-adjacent HTML with nested tables and page furniture. Together they force the M2 parsers to handle plain text and HTML, and the chunker to find structure that differs per document.
+- **Unencumbered.** CUAD v1 is released under CC BY 4.0 by The Atticus Project; EDGAR exhibits are public records not subject to copyright protection. Both can be committed, quoted, and republished in findings.
 
-## Issuers
+## CUAD subset
 
-| Issuer | Ticker | CIK | Industry | Why included |
-| --- | --- | --- | --- | --- |
-| Apple Inc. | AAPL | 320193 | Technology hardware | Large, conventionally structured filings; the clean end of messy |
-| The Coca-Cola Company | KO | 21344 | Consumer staples | Segment-heavy reporting, long proxy; different filing agent conventions |
-| Ford Motor Company | F | 37996 | Automotive and credit | Two-business structure (automotive plus Ford Credit) makes cross-reference questions genuinely hard |
+CUAD (Contract Understanding Atticus Dataset) v1 contains 510 expert-annotated commercial contracts. The subset pins one contract per agreement type, chosen at 18K to 90K characters so every document is fully readable during question authoring:
 
-Three industries mean lookup questions cannot be answered from priors about one sector, and cross-reference questions can span issuers (for example, comparing stated risk factors) as well as documents of one issuer.
+| doc id | Agreement type |
+| --- | --- |
+| CUAD-DISTRIBUTOR | Distributor agreement |
+| CUAD-SUPPLY | Supply agreement |
+| CUAD-LICENSE | Content license agreement |
+| CUAD-HOSTING | License and hosting agreement |
+| CUAD-ENDORSEMENT | Endorsement agreement |
+| CUAD-JOINTVENTURE | Joint venture agreement |
+| CUAD-FRANCHISE | Franchise agreement |
+| CUAD-AGENCY | Agency agreement |
+| CUAD-OUTSOURCING | Outsourcing agreement |
+| CUAD-MAINTENANCE | Support and maintenance agreement |
+| CUAD-SPONSORSHIP | Sponsorship agreement |
+| CUAD-MANUFACTURING | Manufacturing, design, and marketing agreement |
+| CUAD-SERVICES | Services agreement |
+| CUAD-ALLIANCE | Strategic alliance agreement |
+| CUAD-COBRANDING | Co-branding agreement |
+| CUAD-PROMOTION | Promotion and distribution agreement |
 
-## Form types and date range
+### Licensing and attribution
 
-Per issuer: one 10-K (fiscal 2025), two 10-Qs (2026), three 8-Ks (2026), one DEF 14A proxy statement (2026). 21 documents total, spanning October 2025 to July 2026.
+CUAD v1 is licensed CC BY 4.0. Attribution: **CUAD v1, The Atticus Project** (Hendrycks, Burns, Chen, and Ball, "CUAD: An Expert-Annotated NLP Dataset for Legal Contract Review", NeurIPS Datasets and Benchmarks, 2021), https://www.atticusprojectai.org/cuad. This repository redistributes extracted contract texts from the dataset with this attribution, as the license permits and requires. The extracted texts are unmodified.
 
-- **10-K**: the annual report; long narrative plus audited financials; source for lookup and synthesis questions.
-- **10-Q**: quarterly updates; smaller, repetitive structure; good for time-anchored lookups and for out-of-corpus refusal contrast (quarters not in the corpus).
-- **8-K**: event disclosures; short, heterogeneous, often exhibit-driven; the small end of the parsing problem and the demo slice.
-- **DEF 14A**: proxy statements; the messiest HTML in the set (compensation tables, graphics-heavy layouts); a stress test for normalization.
+## Direct EDGAR exhibit 10 supplement
+
+Four material contracts fetched directly from recent filings, pinned by accession number. These are modern HTML exhibits, distinct in format and vintage from the CUAD texts:
+
+| doc id | Filed with | Date |
+| --- | --- | --- |
+| AAPL-EX-10-1-2026-02-24 | Apple Inc. Form 8-K | 2026-02-24 |
+| AAPL-EX-10-2-2026-02-24-B | Apple Inc. Form 8-K | 2026-02-24 |
+| KO-EX-10-1-2026-06-25 | The Coca-Cola Company Form 8-K | 2026-06-25 |
+| KO-EX-10-1-2026-07-29 | The Coca-Cola Company Form 10-Q | 2026-07-29 |
 
 ## Acquisition
 
-Every document is pinned by accession number in `corpus/manifest.json`. `make fetch-corpus` downloads exactly those documents into `corpus/raw/` (gitignored), skipping files already present, one request at a time with a 0.5 second pause, far under the SEC fair-access ceiling. The SEC asks for a descriptive User-Agent with contact information: set `SEC_USER_AGENT` accordingly; the default identifies this repository.
+`make fetch-corpus` materializes everything reproducibly and idempotently:
 
-Re-running the command is idempotent: a second run downloads nothing. Verified on 2026-08-03: 21 downloaded, then 0 downloaded and 21 present, 31 MB total.
+- The CUAD data archive downloads once into `corpus/cache/` and is verified against its pinned sha256 (`f8161d18…`) on every run; per-contract texts are extracted from the archive member by exact title into `corpus/raw/CUAD/`.
+- EDGAR documents download by accession with the SEC fair-access User-Agent (`SEC_USER_AGENT`) and rate limiting, as before.
 
-## Demo slice
-
-`corpus/demo/` commits the smallest 8-K per issuer (128 KB total) so a clean machine can exercise the full pipeline from `docker compose up` without hitting EDGAR. The demo slice is a strict subset of the manifest; it exists for demonstration, and eval runs use the full corpus.
+Verified on 2026-08-04: 20 contracts materialized (784 KB of CUAD text plus 4 HTML exhibits), and an immediate re-run downloaded nothing.
 
 ## Known limitations
 
-- Exhibits are not fetched at M1; the manifest pins primary documents only. If M1 question authoring needs a specific exhibit (for example, a press release attached to an 8-K), the manifest grows by that exhibit in the same PR as the question that cites it.
-- The corpus is English only and United States only; nothing in the eval set should assume otherwise.
-- Filed HTML occasionally references external image assets that are not fetched; parsing must tolerate broken image references.
+- The CUAD texts are the dataset's extracted plain text, not the original filed images; occasional OCR artifacts are part of the corpus by design.
+- The demo slice under `corpus/demo/` still holds legacy filing documents; it is replaced with contract documents in issue #40 together with the legacy manifest removal.
+- The corpus is English only; nothing in the eval set should assume otherwise.
