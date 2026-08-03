@@ -32,7 +32,9 @@ def test_oracle_retrieval_is_perfect_and_echo_is_zero(tmp_path: Path) -> None:
     oracle_dir = runner.run_eval("oracle", out_root=tmp_path / "a")
     perfect = metrics.run_retrieval_metrics(oracle_dir)
     assert perfect["hit_rate"] == 1.0 and perfect["mrr"] == 1.0
-    assert perfect["n"] == 38, "refusal questions are excluded from retrieval metrics"
+    questions = [json.loads(x) for x in open("evalset/questions.jsonl")]
+    non_refusal = sum(q["category"] != "refusal" for q in questions)
+    assert perfect["n"] == non_refusal, "refusal questions are excluded from retrieval metrics"
     echo_dir = runner.run_eval("echo", out_root=tmp_path / "b")
     floor = metrics.run_retrieval_metrics(echo_dir)
     assert floor["hit_rate"] == 0.0 and floor["mrr"] == 0.0
@@ -52,7 +54,10 @@ def test_scoreboard_renders_both_runs(tmp_path: Path) -> None:
     oracle_row = next(r for r in rows if r["variant"] == "oracle")
     assert oracle_row["overall"] == 100.0 and oracle_row["hit_rate"] == 1.0
     echo_row = next(r for r in rows if r["variant"] == "echo")
-    assert echo_row["overall"] == pytest.approx(24.0) and echo_row["hit_rate"] == 0.0
+    refusals = sum(json.loads(x)["category"] == "refusal" for x in open("evalset/questions.jsonl"))
+    total = sum(1 for _ in open("evalset/questions.jsonl"))
+    assert echo_row["overall"] == pytest.approx(round(100 * refusals / total, 1))
+    assert echo_row["hit_rate"] == 0.0
     assert json.loads(json.dumps(oracle_row))  # rows are JSON serializable
 
 
