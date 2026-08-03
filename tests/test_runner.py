@@ -40,11 +40,12 @@ def test_full_run_records_every_question(tmp_path: Path) -> None:
     run_dir = runner.run_eval("echo", out_root=tmp_path)
     records = [json.loads(line) for line in (run_dir / "records.jsonl").read_text().splitlines()]
     meta = json.loads((run_dir / "run.json").read_text())
-    assert len(records) == 50
-    assert meta["question_count"] == 50
+    expected = sum(1 for _ in open("evalset/questions.jsonl"))
+    assert len(records) == expected
+    assert meta["question_count"] == expected
     assert meta["variant"] == "echo"
     assert all(r["latency_ms"] >= 0 for r in records)
-    assert {r["question_id"] for r in records} == {f"q-{i:03d}" for i in range(1, 51)}
+    assert {r["question_id"] for r in records} == {f"q-{i:03d}" for i in range(1, expected + 1)}
 
 
 def test_smoke_run_selects_exactly_the_slice(tmp_path: Path) -> None:

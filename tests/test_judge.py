@@ -38,7 +38,9 @@ def test_echo_scores_at_the_floor_except_refusals(echo_run: Path) -> None:
     assert means["refusal"] == 100.0
     assert means["lookup"] == 0.0
     assert means["synthesis"] == 0.0
-    assert means["overall"] == pytest.approx(24.0)
+    questions = [json.loads(x) for x in open("evalset/questions.jsonl")]
+    refusals = sum(q["category"] == "refusal" for q in questions)
+    assert means["overall"] == pytest.approx(round(100 * refusals / len(questions), 1))
 
 
 def test_judge_meta_records_the_pins(oracle_run: Path) -> None:
@@ -46,7 +48,7 @@ def test_judge_meta_records_the_pins(oracle_run: Path) -> None:
     assert meta["model"] == "claude-sonnet-5"
     assert meta["prompt_version"] == 1
     assert meta["backend"] == "mock"
-    assert meta["scored"] == 50
+    assert meta["scored"] == sum(1 for _ in open("evalset/questions.jsonl"))
 
 
 def test_audit_sheet_is_blind_and_deterministic(oracle_run: Path) -> None:
@@ -59,7 +61,8 @@ def test_audit_sheet_is_blind_and_deterministic(oracle_run: Path) -> None:
     assert all("score" not in row for row in rows), "judge scores must not anchor the auditor"
     run_meta = json.loads((oracle_run / "run.json").read_text())
     ids = [row["question_id"] for row in rows]
-    again = judge.audit_sample_ids(run_meta, [f"q-{i:03d}" for i in range(1, 51)], 15)
+    total = sum(1 for _ in open("evalset/questions.jsonl"))
+    again = judge.audit_sample_ids(run_meta, [f"q-{i:03d}" for i in range(1, total + 1)], 15)
     assert ids == again
 
 
