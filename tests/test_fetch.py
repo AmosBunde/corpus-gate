@@ -15,11 +15,10 @@ def test_manifest_pins_the_documented_corpus() -> None:
     docs = manifest["documents"]
     cuad = [d for d in docs if d.get("source") == "cuad"]
     ex10 = [d for d in docs if d.get("form", "").startswith("EX-10")]
-    legacy = [d for d in docs if d.get("legacy")]
     assert len(cuad) == 16
     assert len(ex10) == 4
-    assert len(legacy) == 21
-    assert len(docs) == 41
+    assert not any(d.get("legacy") for d in docs)
+    assert len(docs) == 20
     for doc in cuad:
         assert doc["doc_id"].startswith("CUAD-")
         assert doc["title"]

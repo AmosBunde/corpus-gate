@@ -1,6 +1,6 @@
 # Corpus selection
 
-The pinned corpus is public commercial contracts: a 16-contract subset of CUAD supplemented with 4 exhibit 10 material contracts fetched directly from SEC EDGAR, 20 documents total. The owner pinned this corpus on 2026-08-04; substituting another corpus requires owner approval. An earlier corpus of general EDGAR filings was selected before the pin existed; its manifest entries are retained temporarily (marked `legacy: true`) until the eval set re-authoring lands in issues #39 and #40, after which they are removed.
+The pinned corpus is public commercial contracts: a 16-contract subset of CUAD supplemented with 4 exhibit 10 material contracts fetched directly from SEC EDGAR, 20 documents total. The owner pinned this corpus on 2026-08-04; substituting another corpus requires owner approval. An earlier corpus of general EDGAR filings predated the pin; it was retired in issue #40 once the eval set was fully re-authored against contracts.
 
 ## Why commercial contracts
 
@@ -55,8 +55,11 @@ Four material contracts fetched directly from recent filings, pinned by accessio
 
 Verified on 2026-08-04: 20 contracts materialized (784 KB of CUAD text plus 4 HTML exhibits), and an immediate re-run downloaded nothing.
 
+## Demo slice
+
+`corpus/demo/` commits three of the smaller CUAD contracts (the endorsement, joint venture, and agency agreements) so a clean machine can exercise the pipeline without any network fetch. The demo slice is a strict subset of the manifest.
+
 ## Known limitations
 
 - The CUAD texts are the dataset's extracted plain text, not the original filed images; occasional OCR artifacts are part of the corpus by design.
-- The demo slice under `corpus/demo/` still holds legacy filing documents; it is replaced with contract documents in issue #40 together with the legacy manifest removal.
 - The corpus is English only; nothing in the eval set should assume otherwise.
