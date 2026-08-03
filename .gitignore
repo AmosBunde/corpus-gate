@@ -17,8 +17,9 @@ corpus/normalized/
 models/
 *.gguf
 
-# Run outputs (promoted scoreboards are committed explicitly)
-runs/
+# Run outputs; promoted scoreboards under runs/promoted/ are committed
+runs/*
+!runs/promoted/
 
 # Environment
 .env

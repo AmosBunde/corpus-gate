@@ -21,7 +21,7 @@ export default function App() {
   const [apiStatus, setApiStatus] = useState("checking the API");
 
   useEffect(() => {
-    fetch("http://localhost:8000/health")
+    fetch("/api/health")
       .then((r) => r.json())
       .then((b) => setApiStatus(`API ${b.status}, backend ${b.model_backend}`))
       .catch(() => setApiStatus("API unreachable"));
