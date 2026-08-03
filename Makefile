@@ -10,7 +10,7 @@ RUFF ?= .venv/bin/ruff
 PYTEST ?= .venv/bin/pytest
 UVICORN ?= .venv/bin/uvicorn
 MODEL_BACKEND ?= local
-VARIANT ?= current
+VARIANT ?= echo
 PORT ?= 8000
 UI_PORT ?= 3000
 
@@ -44,7 +44,7 @@ eval-set:
 	$(PYTHON) -m corpusgate.evals.schema --complete
 
 eval:
-	$(call not_yet,eval,M1)
+	$(PYTHON) -m corpusgate.evals.runner --variant $(VARIANT)
 
 smoke:
 	$(call not_yet,smoke,M1)
