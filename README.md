@@ -176,10 +176,12 @@ CorpusGate is CPU-first: every stage except LoRA training runs on CPU with eithe
   "question": "...",
   "reference_answer": "...",
   "rubric": ["claim A present", "claim B cited to the correct filing", "..."],
-  "gold_chunk_ids": ["doc-3:chunk-41", "doc-7:chunk-12"],
+  "gold_anchors": ["AAPL-10-K-2025-10-31#item-7", "KO-10-K-2026-02-20#item-7"],
   "smoke": false
 }
 ```
+
+Gold evidence is pinned as anchors of the form `DOCID#section-slug`, where `DOCID` is `TICKER-FORM-FILINGDATE` from `corpus/manifest.json` and the slug names a stable structural unit of the filing (`item-1a`, `part1-item1`, `item-2.02`; conventions per form type in `evalset/categories.md`). The M2 chunker must mint chunk IDs that carry these anchors, so anchors written before ingestion code exists stay resolvable to chunk sets afterward. Refusal questions carry no anchors by definition.
 
 Categories, with a minimum of ten questions each: `lookup`, `cross_reference`, `synthesis`, `refusal` (out-of-corpus questions the system must decline). The ten questions with `"smoke": true` form the smoke slice wired into CI.
 
@@ -199,7 +201,7 @@ Every variant answers in this schema. An uncited claim is a scored failure; a fa
 
 - **Answer quality**: the pinned judge scores each answer against the rubric, 0 to 100 per question, averaged per category and overall.
 - **Citation correctness**: cited chunk IDs must exist and support the claims they anchor; scored by the judge with the cited passages in context.
-- **Retrieval metrics**: hit rate at k and MRR against `gold_chunk_ids`, computed mechanically and reported independently of answer quality.
+- **Retrieval metrics**: hit rate at k and MRR against `gold_anchors`, computed mechanically and reported independently of answer quality; a retrieved chunk counts as a hit when its document and section match a gold anchor.
 - **Judge audit**: every full run samples 15 questions for human scoring; agreement (mean absolute difference and pass/fail agreement rate) is reported in the milestone finding.
 
 ### 5.4 Gate decision
