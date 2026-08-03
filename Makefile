@@ -12,6 +12,7 @@ UVICORN ?= .venv/bin/uvicorn
 MODEL_BACKEND ?= local
 VARIANT ?= echo
 PORT ?= 8000
+RUN ?= latest
 UI_PORT ?= 3000
 
 define not_yet
@@ -20,7 +21,7 @@ endef
 
 .PHONY: venv install lint format test \
         eval-set ingest eval-base rag eval agent finetune gate smoke \
-        fetch-corpus serve ui
+        judge agreement fetch-corpus serve ui
 
 venv:
 	python3 -m venv .venv
@@ -45,6 +46,7 @@ eval-set:
 
 eval:
 	$(PYTHON) -m corpusgate.evals.runner --variant $(VARIANT)
+	$(PYTHON) -m corpusgate.evals.judge score --run latest $(if $(JUDGE_BACKEND),--backend $(JUDGE_BACKEND),)
 
 smoke:
 	$(call not_yet,smoke,M1)
@@ -54,6 +56,12 @@ eval-base:
 
 gate:
 	$(call not_yet,gate,M2)
+
+judge:
+	$(PYTHON) -m corpusgate.evals.judge score --run $(RUN) $(if $(JUDGE_BACKEND),--backend $(JUDGE_BACKEND),)
+
+agreement:
+	$(PYTHON) -m corpusgate.evals.judge agreement --run $(RUN)
 
 # ---- Ingestion and variants (milestones M2 to M4) -----------------------
 
