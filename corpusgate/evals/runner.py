@@ -51,6 +51,7 @@ def run_eval(
                 "answer": result.answer,
                 "citations": [asdict(c) for c in result.citations],
                 "refused": result.refused,
+                "retrieved": result.retrieved,
                 "latency_ms": latency_ms,
                 "prompt_tokens": result.prompt_tokens,
                 "completion_tokens": result.completion_tokens,
