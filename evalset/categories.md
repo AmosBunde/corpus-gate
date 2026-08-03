@@ -38,4 +38,4 @@ The M2 chunker is required to mint chunk IDs that carry these anchors (every chu
 
 ## Balance
 
-The complete set (after the second authoring PR) holds 50 or more questions with at least 10 per category, and exactly 10 questions marked `"smoke": true` spanning all four categories form the CI smoke slice. The current state is validated by `make eval-set`; completeness is enforced with the `--complete` flag once the second half lands.
+The complete set holds 50 questions: 15 lookup, 12 cross_reference, 11 synthesis, and 12 refusal, with exactly 10 questions marked `"smoke": true` spanning all four categories (3 lookup, 2 cross_reference, 2 synthesis, 3 refusal) forming the CI smoke slice. `make eval-set` enforces both the schema and these completeness rules. Cross-reference questions carry at least two gold anchors by construction; where the exact section of a fact is genuinely ambiguous, a question lists the plausible sections and retrieval counts a hit on any of them.

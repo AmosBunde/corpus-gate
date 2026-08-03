@@ -34,13 +34,25 @@ def test_committed_eval_set_is_valid() -> None:
     assert schema.validate(QUESTIONS, MANIFEST) == []
 
 
-def test_committed_set_has_lookup_and_refusal_coverage() -> None:
+def test_committed_set_is_complete() -> None:
+    assert schema.validate(QUESTIONS, MANIFEST, require_complete=True) == []
     questions = schema.load_questions(QUESTIONS)
+    assert len(questions) >= 50
     counts: dict[str, int] = {}
+    smoke: dict[str, int] = {}
     for q in questions:
         counts[q["category"]] = counts.get(q["category"], 0) + 1
-    assert counts["lookup"] >= 10
-    assert counts["refusal"] >= 10
+        if q["smoke"]:
+            smoke[q["category"]] = smoke.get(q["category"], 0) + 1
+    assert all(counts[c] >= 10 for c in schema.CATEGORIES)
+    assert sum(smoke.values()) == 10
+    assert set(smoke) == set(schema.CATEGORIES)
+
+
+def test_cross_reference_questions_span_multiple_anchors() -> None:
+    for q in schema.load_questions(QUESTIONS):
+        if q["category"] == "cross_reference":
+            assert len(q["gold_anchors"]) >= 2, f"{q['id']} needs evidence from more than one place"
 
 
 def test_valid_question_passes(known_docs: set[str]) -> None:
@@ -85,6 +97,8 @@ def test_malformed_json_line_raises(tmp_path: Path) -> None:
         schema.load_questions(path)
 
 
-def test_incomplete_set_fails_complete_mode() -> None:
-    errors = schema.validate(QUESTIONS, MANIFEST, require_complete=True)
+def test_incomplete_set_fails_complete_mode(tmp_path: Path) -> None:
+    path = tmp_path / "q.jsonl"
+    path.write_text(json.dumps(valid_question()) + "\n")
+    errors = schema.validate(path, MANIFEST, require_complete=True)
     assert any("50+" in e for e in errors)

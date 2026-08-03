@@ -41,7 +41,7 @@ test:
 # ---- Eval gate (milestone M1) -------------------------------------------
 
 eval-set:
-	$(PYTHON) -m corpusgate.evals.schema
+	$(PYTHON) -m corpusgate.evals.schema --complete
 
 eval:
 	$(call not_yet,eval,M1)
