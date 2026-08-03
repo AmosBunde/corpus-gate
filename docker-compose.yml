@@ -23,6 +23,8 @@ services:
       dockerfile: docker/ui.Dockerfile
     ports:
       - "${UI_PORT:-3000}:3000"
+    environment:
+      API_PROXY_TARGET: http://api:8000
     depends_on:
       - api
 

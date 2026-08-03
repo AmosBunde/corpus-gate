@@ -254,7 +254,7 @@ make serve        # API on :8000
 make ui           # UI dev server on :3000
 ```
 
-`docker compose up --build` on a clean machine serves the UI on :3000 and the API on :8000 against the committed demo corpus in `corpus/demo/`. The full corpus is fetched with `make fetch-corpus` and is gitignored.
+`docker compose up --build` on a clean machine serves the UI on :3000 and the API on :8000; from milestone M2 onward the stack answers against the committed demo corpus in `corpus/demo/`. The full corpus is fetched with `make fetch-corpus` and is gitignored.
 
 ## 9. Definition of done
 
