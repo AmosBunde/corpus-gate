@@ -38,7 +38,7 @@ def doc_id(doc: dict) -> str:
 
 def manifest_doc_ids(manifest_path: str | Path) -> set[str]:
     manifest = json.loads(Path(manifest_path).read_text())
-    return {doc_id(doc) for doc in manifest["documents"]}
+    return {doc.get("doc_id") or doc_id(doc) for doc in manifest["documents"]}
 
 
 def parse_anchor(anchor: str) -> tuple[str, str]:

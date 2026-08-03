@@ -13,6 +13,7 @@ ui/dist/
 
 # Data and models (demo slice in corpus/demo/ is committed)
 corpus/raw/
+corpus/cache/
 corpus/normalized/
 models/
 *.gguf

@@ -1,6 +1,8 @@
 """Corpus acquisition is pinned, idempotent, and testable without the network."""
 
+import io
 import json
+import zipfile
 from pathlib import Path
 
 from corpusgate.ingest import fetch
@@ -11,21 +13,22 @@ MANIFEST = Path("corpus/manifest.json")
 def test_manifest_pins_the_documented_corpus() -> None:
     manifest = fetch.load_manifest(MANIFEST)
     docs = manifest["documents"]
-    assert len(docs) == 21
-    by_form: dict[str, int] = {}
-    for doc in docs:
-        by_form[doc["form"]] = by_form.get(doc["form"], 0) + 1
-        for key in (
-            "issuer",
-            "ticker",
-            "cik",
-            "form",
-            "accession",
-            "primary_document",
-            "filing_date",
-        ):
+    cuad = [d for d in docs if d.get("source") == "cuad"]
+    ex10 = [d for d in docs if d.get("form", "").startswith("EX-10")]
+    legacy = [d for d in docs if d.get("legacy")]
+    assert len(cuad) == 16
+    assert len(ex10) == 4
+    assert len(legacy) == 21
+    assert len(docs) == 41
+    for doc in cuad:
+        assert doc["doc_id"].startswith("CUAD-")
+        assert doc["title"]
+    for doc in ex10:
+        for key in ("doc_id", "cik", "accession", "primary_document", "filing_date"):
             assert doc[key], f"{key} missing on {doc}"
-    assert by_form == {"10-K": 3, "10-Q": 6, "8-K": 9, "DEF 14A": 3}
+    assert manifest["cuad"]["sha256"] and manifest["cuad"]["license"] == "CC BY 4.0"
+    ids = [d.get("doc_id") or fetch.destination(d, "x").name for d in docs]
+    assert len(ids) == len(set(ids))
 
 
 def test_document_url_shape() -> None:
@@ -40,15 +43,32 @@ def test_document_url_shape() -> None:
     )
 
 
-def test_destination_is_stable_and_form_safe(tmp_path: Path) -> None:
-    doc = {
+def test_destination_per_source(tmp_path: Path) -> None:
+    edgar = {
         "ticker": "KO",
         "form": "DEF 14A",
         "filing_date": "2026-03-16",
         "primary_document": "x.htm",
     }
-    dest = fetch.destination(doc, tmp_path)
-    assert dest == tmp_path / "KO" / "DEF14A_2026-03-16_x.htm"
+    assert fetch.destination(edgar, tmp_path) == tmp_path / "KO" / "DEF14A_2026-03-16_x.htm"
+    cuad = {"source": "cuad", "doc_id": "CUAD-SUPPLY", "title": "whatever"}
+    assert fetch.destination(cuad, tmp_path) == tmp_path / "CUAD" / "CUAD-SUPPLY.txt"
+
+
+def test_cuad_texts_extraction(tmp_path: Path) -> None:
+    payload = {
+        "data": [
+            {"title": "A CONTRACT", "paragraphs": [{"context": "the full text"}]},
+            {"title": "ANOTHER", "paragraphs": [{"context": "more text"}]},
+        ]
+    }
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as z:
+        z.writestr("CUADv1.json", json.dumps(payload))
+    archive = tmp_path / "data.zip"
+    archive.write_bytes(buffer.getvalue())
+    texts = fetch.cuad_texts(archive, "CUADv1.json")
+    assert texts == {"A CONTRACT": "the full text", "ANOTHER": "more text"}
 
 
 def test_fetch_skips_existing_files_without_network(tmp_path: Path) -> None:
@@ -63,12 +83,14 @@ def test_fetch_skips_existing_files_without_network(tmp_path: Path) -> None:
                 "filing_date": "2026-01-01",
                 "issuer": "T Co",
             },
+            {"source": "cuad", "doc_id": "CUAD-X", "title": "X"},
         ]
     }
     manifest_path = tmp_path / "manifest.json"
     manifest_path.write_text(json.dumps(manifest))
-    pre = fetch.destination(manifest["documents"][0], tmp_path / "raw")
-    pre.parent.mkdir(parents=True)
-    pre.write_text("already here")
+    for doc in manifest["documents"]:
+        pre = fetch.destination(doc, tmp_path / "raw")
+        pre.parent.mkdir(parents=True, exist_ok=True)
+        pre.write_text("already here")
     downloaded, skipped = fetch.fetch(manifest_path, tmp_path / "raw")
-    assert (downloaded, skipped) == (0, 1)
+    assert (downloaded, skipped) == (0, 2)
