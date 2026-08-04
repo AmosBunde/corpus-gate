@@ -69,9 +69,23 @@ class OracleVariant:
         )
 
 
+def _base_variant():
+    from corpusgate.evals.rag import BaseVariant
+
+    return BaseVariant()
+
+
+def _rag_variant():
+    from corpusgate.evals.rag import RagVariant
+
+    return RagVariant()
+
+
 VARIANTS: dict[str, Callable[[], object]] = {
     EchoVariant.name: EchoVariant,
     OracleVariant.name: OracleVariant,
+    "base": _base_variant,
+    "rag": _rag_variant,
 }
 
 
