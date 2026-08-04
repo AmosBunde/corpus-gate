@@ -13,6 +13,7 @@ MODEL_BACKEND ?= local
 VARIANT ?= echo
 PORT ?= 8000
 RUN ?= latest
+EMBEDDER ?= local
 UI_PORT ?= 3000
 
 define not_yet
@@ -74,6 +75,7 @@ fetch-corpus:
 ingest:
 	$(PYTHON) -m corpusgate.ingest.parse
 	$(PYTHON) -m corpusgate.ingest.chunk
+	$(PYTHON) -m corpusgate.retrieval.index --embedder $(EMBEDDER)
 
 rag:
 	$(call not_yet,rag,M2)
