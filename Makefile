@@ -72,7 +72,7 @@ fetch-corpus:
 	$(PYTHON) -m corpusgate.ingest.fetch --manifest corpus/manifest.json --dest corpus/raw
 
 ingest:
-	$(call not_yet,ingest,M2)
+	$(PYTHON) -m corpusgate.ingest.parse
 
 rag:
 	$(call not_yet,rag,M2)
