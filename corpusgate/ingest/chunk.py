@@ -89,7 +89,7 @@ def detect_sections(text: str) -> list[tuple[str, int]]:
     return sections
 
 
-def chunk_section(slug: str, doc_id: str, text: str, base: int) -> list[dict]:
+def chunk_section(slug: str, doc_id: str, text: str, base: int) -> list[dict]:  # noqa: D103
     chunks = []
     start = 0
     ordinal = 0
@@ -102,6 +102,7 @@ def chunk_section(slug: str, doc_id: str, text: str, base: int) -> list[dict]:
                     "chunk_id": f"{doc_id}#{slug}:{ordinal}",
                     "doc_id": doc_id,
                     "section": slug,
+                    "doc_title": "",
                     "text": piece,
                     "char_start": base + start,
                     "char_end": base + end,
@@ -114,9 +115,18 @@ def chunk_section(slug: str, doc_id: str, text: str, base: int) -> list[dict]:
     return chunks
 
 
+def doc_title(text: str, doc_id: str) -> str:
+    """A short human title from the document head, for embedding context."""
+    for line in text.split("\n")[:12]:
+        if re.search(r"AGREEMENT|PLAN|LETTER|CONTRACT", line, re.I) and len(line) < 90:
+            return line.strip()
+    return doc_id
+
+
 def chunk_document(normalized: dict) -> list[dict]:
     text = normalized["text"]
     doc_id = normalized["doc_id"]
+    title = doc_title(text, doc_id)
     sections = detect_sections(text)
     spans: list[tuple[str, int, int]] = []
     first = sections[0][1] if sections else len(text)
@@ -126,8 +136,15 @@ def chunk_document(normalized: dict) -> list[dict]:
         end = sections[i + 1][1] if i + 1 < len(sections) else len(text)
         spans.append((slug, start, end))
     chunks = []
+    next_ordinal: dict[str, int] = {}
     for slug, start, end in spans:
-        chunks.extend(chunk_section(slug, doc_id, text[start:end], start))
+        section_chunks = chunk_section(slug, doc_id, text[start:end], start)
+        base = next_ordinal.get(slug, 0)
+        for i, c in enumerate(section_chunks):
+            c["chunk_id"] = f"{doc_id}#{slug}:{base + i}"
+            c["doc_title"] = title
+        next_ordinal[slug] = base + len(section_chunks)
+        chunks.extend(section_chunks)
     return chunks
 
 
