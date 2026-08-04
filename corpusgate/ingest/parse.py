@@ -65,6 +65,9 @@ def parse_txt(raw: str) -> str:
 def normalize_text(text: str) -> str:
     """Collapse noise while keeping the line structure section detection needs."""
     text = text.replace("\r\n", "\n").replace("\r", "\n").replace("\xa0", " ")
+    # CUAD plain text carries literal, sometimes misspelled entity remnants
+    text = re.sub(r"&[a-z]?[bn]bsp;", " ", text)
+    text = text.replace("&amp;", "&")
     text = re.sub(r"[ \t]+", " ", text)
     lines = [line.strip() for line in text.split("\n")]
     text = "\n".join(lines)
