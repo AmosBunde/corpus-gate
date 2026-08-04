@@ -73,6 +73,7 @@ fetch-corpus:
 
 ingest:
 	$(PYTHON) -m corpusgate.ingest.parse
+	$(PYTHON) -m corpusgate.ingest.chunk
 
 rag:
 	$(call not_yet,rag,M2)
