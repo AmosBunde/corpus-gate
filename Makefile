@@ -56,7 +56,7 @@ eval-base:
 	$(call not_yet,eval-base,M2)
 
 gate:
-	$(call not_yet,gate,M4)
+	$(PYTHON) -m corpusgate.evals.gate --candidate $(CANDIDATE) $(if $(PROMOTE),--promote,)
 
 judge:
 	$(PYTHON) -m corpusgate.evals.judge score --run $(RUN) $(if $(JUDGE_BACKEND),--backend $(JUDGE_BACKEND),)
