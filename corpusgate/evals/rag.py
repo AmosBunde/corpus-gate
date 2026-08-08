@@ -87,12 +87,12 @@ class AnthropicAnswerBackend:
         self.model = model or api_model()
         self.max_tokens = max_tokens
 
-    def complete(self, prompt: str) -> tuple[dict, int, int]:
+    def complete(self, prompt: str, schema: dict | None = None) -> tuple[dict, int, int]:
         response = self._client.messages.create(
             model=self.model,
             max_tokens=self.max_tokens,
             thinking={"type": "disabled"},
-            output_config={"format": {"type": "json_schema", "schema": ANSWER_SCHEMA}},
+            output_config={"format": {"type": "json_schema", "schema": schema or ANSWER_SCHEMA}},
             messages=[{"role": "user", "content": prompt}],
         )
         if response.stop_reason == "refusal":
@@ -112,7 +112,7 @@ class LocalAnswerBackend:
         self.url = (url or os.environ.get("LLM_URL", "http://localhost:8080")).rstrip("/")
         self.max_tokens = max_tokens
 
-    def complete(self, prompt: str) -> tuple[dict, int, int]:
+    def complete(self, prompt: str, schema: dict | None = None) -> tuple[dict, int, int]:
         response = self._http.post(
             f"{self.url}/v1/chat/completions",
             json={

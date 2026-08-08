@@ -81,11 +81,18 @@ def _rag_variant():
     return RagVariant()
 
 
+def _agent_variant():
+    from corpusgate.agent.loop import AgentVariant
+
+    return AgentVariant()
+
+
 VARIANTS: dict[str, Callable[[], object]] = {
     EchoVariant.name: EchoVariant,
     OracleVariant.name: OracleVariant,
     "base": _base_variant,
     "rag": _rag_variant,
+    "agent": _agent_variant,
 }
 
 
