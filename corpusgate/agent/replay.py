@@ -17,7 +17,8 @@ def render(trace: dict) -> str:
     for step in trace["steps"]:
         forced = " (forced)" if step.get("forced") else ""
         tokens = f"{step['prompt_tokens']}+{step['completion_tokens']} tok"
-        header = f"step {step['step']}: {step['action']}{forced}  [{step['latency_ms']} ms, {tokens}]"
+        timing = f"[{step['latency_ms']} ms, {tokens}]"
+        header = f"step {step['step']}: {step['action']}{forced}  {timing}"
         lines.append(header)
         if step.get("args"):
             lines.append(f"  args: {json.dumps(step['args'])}")
