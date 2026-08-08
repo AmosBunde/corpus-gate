@@ -61,6 +61,12 @@ def run_eval(
     with open(run_dir / "records.jsonl", "w") as f:
         for record in records:
             f.write(json.dumps(record) + "\n")
+    traces = getattr(variant, "traces", None)
+    if traces:
+        traces_dir = run_dir / "traces"
+        traces_dir.mkdir()
+        for question_id, trace in traces.items():
+            (traces_dir / f"{question_id}.json").write_text(json.dumps(trace, indent=2) + "\n")
     run_meta = {
         "variant": variant_name,
         "started_at": started.isoformat(),
