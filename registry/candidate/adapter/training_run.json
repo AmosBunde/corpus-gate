@@ -1,0 +1,8 @@
+{
+  "base_model": "sshleifer/tiny-gpt2",
+  "dry_run": true,
+  "steps": 2,
+  "final_loss": 10.824719429016113,
+  "pairs": 140,
+  "device": "cpu"
+}

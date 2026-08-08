@@ -84,7 +84,7 @@ agent:
 	$(call not_yet,agent,M3)
 
 finetune:
-	$(call not_yet,finetune,M4)
+	$(PYTHON) -m corpusgate.finetune.train $(if $(DRY_RUN),--dry-run,)
 
 # ---- Serving (stubbed in M0 by issue #8, completed in M5) ---------------
 

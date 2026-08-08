@@ -18,6 +18,9 @@ corpus/normalized/
 models/
 *.gguf
 
+# Dry-run adapters are reproducible artifacts; real adapters register via #62
+registry/candidate/adapter/*.safetensors
+
 # Run outputs; promoted scoreboards under runs/promoted/ are committed
 runs/*
 !runs/promoted/

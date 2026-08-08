@@ -1,0 +1,19 @@
+# LoRA training configuration. The full profile targets the pinned base model
+# on a rented 24 GB GPU; the dry_run profile proves the identical code path on
+# CPU in under a minute with a tiny stand-in model.
+base_model: Qwen/Qwen2.5-7B-Instruct
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: [q_proj, k_proj, v_proj, o_proj]
+training:
+  learning_rate: 0.0002
+  epochs: 2
+  batch_size: 2
+  max_seq_len: 1024
+dry_run:
+  base_model: sshleifer/tiny-gpt2
+  max_steps: 2
+  batch_size: 2
+  max_seq_len: 128
