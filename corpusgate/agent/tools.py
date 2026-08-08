@@ -81,7 +81,11 @@ class Toolbox:
                 limit=k,
                 with_payload=True,
                 query_filter=models.Filter(
-                    must=[models.FieldCondition(key="doc_id", match=models.MatchValue(value=doc_id))]
+                    must=[
+                        models.FieldCondition(
+                            key="doc_id", match=models.MatchValue(value=doc_id)
+                        )
+                    ]
                 ),
             ).points
             results[doc_id] = [{**hit.payload, "score": float(hit.score)} for hit in hits]
