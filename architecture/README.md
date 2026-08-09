@@ -10,4 +10,4 @@ Five interactive HTML diagrams, rendered with Archify from the JSON specificatio
 | [ingestion.html](ingestion.html) | dataflow | `ingestion.dataflow.json` | Filings to provenance-carrying chunks, vectors, and independently scored retrieval |
 | [adapter.html](adapter.html) | lifecycle | `adapter.lifecycle.json` | A LoRA adapter version from curated pairs through decontamination and the gate |
 
-The Mermaid sources in the repository README section 2 and the styled overview in `docs/architecture.html` remain the canonical quick references. Any PR that changes a component boundary or a tool updates the affected diagram here in the same PR, by editing the JSON specification and re-rendering with Archify at showcase quality.
+The Mermaid sources in the repository README section 2 remain the canonical quick reference, and `docs/architecture.html` is an Archify delivery of the system specification in this directory. Any PR that changes a component boundary or a tool updates the affected diagram here in the same PR, by editing the JSON specification and re-rendering with Archify at showcase quality.

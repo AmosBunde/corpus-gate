@@ -110,7 +110,7 @@ sequenceDiagram
     W-->>U: rendered cited passages
 ```
 
-The system diagram above is also rendered as an interactive page: [`system.html`](system.html) at the repository root, generated with Archify from `architecture/system.architecture.json` and matching the Mermaid node for node. `docs/architecture.html` carries the styled SVG overview, and `architecture/` holds the full set of five interactive diagrams (system, query sequence, eval gate workflow, ingestion data flow, adapter lifecycle) with their JSON sources. Any PR that changes a component boundary or a tool updates the Mermaid source above, the rendered pages, and the affected diagram in `architecture/` in the same PR.
+The system diagram above is also rendered as an interactive page: [`system.html`](system.html) at the repository root, generated with Archify from `architecture/system.architecture.json` and matching the Mermaid node for node. `docs/architecture.html` is the same Archify render delivered from the same specification, kept for the documentation path, and `architecture/` holds the full set of five interactive diagrams (system, query sequence, eval gate workflow, ingestion data flow, adapter lifecycle) with their JSON sources. Any PR that changes a component boundary or a tool updates the Mermaid source above, the rendered pages, and the affected diagram in `architecture/` in the same PR.
 
 ## 3. Repository structure
 
@@ -131,7 +131,7 @@ corpus-gate/
   runs/                    eval run outputs (gitignored except promoted scoreboards)
   architecture/            interactive diagram set (HTML + JSON sources, via Archify)
   docs/
-    architecture.html      styled system diagram (kept in sync with Mermaid)
+    architecture.html      system diagram, Archify render of the same spec as system.html
     corpus.md              corpus selection rationale (M1)
     findings/              one written analysis per milestone
   ui/                      React app
