@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getToken, setToken, streamQuery } from "./api.js";
+import { CitationList, Refusal } from "./Citations.jsx";
 
 const styles = {
   page: {
@@ -135,16 +136,16 @@ export default function App() {
         </div>
         {working && <p style={styles.working}>{phase}…</p>}
         {error && <div style={styles.error}>{error}</div>}
-        {result && (
+        {result && result.refused && <Refusal answer={result.answer} />}
+        {result && !result.refused && (
           <div style={styles.answer}>
             {result.answer}
+            <CitationList citations={result.citations} />
             <div style={{ marginTop: "12px" }}>
               <span style={styles.meta}>
-                {result.refused
-                  ? "the model declined to answer from the corpus"
-                  : `${result.citations.length} cited passage${
-                      result.citations.length === 1 ? "" : "s"
-                    }`}
+                {`${result.citations.length} cited passage${
+                  result.citations.length === 1 ? "" : "s"
+                }`}
                 {" · "}
                 {(result.latency_ms / 1000).toFixed(1)}s
                 {" · "}
