@@ -33,3 +33,6 @@ runs/*
 .vscode/
 .idea/
 .DS_Store
+
+# Per-request serving logs
+serve_logs/
