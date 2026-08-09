@@ -96,9 +96,11 @@ class ScriptedTransport:
     def __init__(self, contents: list[str]):
         self._contents = list(contents)
         self.calls = 0
+        self.bodies: list[dict] = []
 
     def post(self, url, json=None):
         self.calls += 1
+        self.bodies.append(json)
         content = self._contents.pop(0)
 
         class Response:
@@ -135,3 +137,11 @@ def test_local_backend_degrades_to_refusal_after_two_failures() -> None:
     assert transport.calls == 2
     assert payload["refused"] is True
     assert "JSONDecodeError" in payload["answer"]
+
+
+def test_local_backend_sends_the_answer_schema_as_grammar() -> None:
+    good = json.dumps({"answer": "ok", "citations": [], "refused": False})
+    transport = ScriptedTransport([good])
+    _local_backend(transport).complete("q")
+    response_format = transport.bodies[0]["response_format"]
+    assert response_format["schema"] == ANSWER_SCHEMA

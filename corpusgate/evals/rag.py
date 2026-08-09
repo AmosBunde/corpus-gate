@@ -125,7 +125,14 @@ class LocalAnswerBackend:
                     json={
                         "messages": [{"role": "user", "content": prompt}],
                         "max_tokens": self.max_tokens,
-                        "response_format": {"type": "json_object"},
+                        # llama.cpp compiles the schema to a grammar, so the
+                        # shape is enforced, not merely requested: without it
+                        # the model drifts into [chunk_id, quote] pair arrays
+                        # that the citation normalizer must discard.
+                        "response_format": {
+                            "type": "json_object",
+                            "schema": schema or ANSWER_SCHEMA,
+                        },
                     },
                 )
                 response.raise_for_status()
