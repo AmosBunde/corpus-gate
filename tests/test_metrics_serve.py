@@ -40,3 +40,20 @@ def test_percentiles() -> None:
     assert metrics.percentile(values, 0.5) == 30.0
     assert metrics.percentile(values, 0.95) == 100.0
     assert metrics.percentile([], 0.5) == 0.0
+
+
+def test_loadtest_summary_uses_shared_percentiles() -> None:
+    from corpusgate.serve.loadtest import summarize
+
+    summary = summarize([100.0, 200.0, 300.0, 400.0])
+    assert summary["count"] == 4
+    assert summary["p50_ms"] == 300.0
+    assert summary["min_ms"] == 100.0 and summary["max_ms"] == 400.0
+
+
+def test_loadtest_reads_smoke_questions() -> None:
+    from corpusgate.serve.loadtest import load_smoke_questions
+
+    questions = load_smoke_questions()
+    assert len(questions) == 10
+    assert all(isinstance(q, str) and q for q in questions)
