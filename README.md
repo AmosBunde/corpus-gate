@@ -404,4 +404,10 @@ Merges happen only with CI green, including the smoke-slice eval where applicabl
 
 This section is populated from real `make gate` runs, starting with the first full baseline at M2. Required columns: the four category scores, overall, hit rate at 5, MRR, p50 latency, and cost per query, one row per variant (base, RAG, RAG plus agent, RAG plus agent plus FT), with the current champion marked.
 
-No runs have been recorded yet. The first entry lands with the M2 baseline PR.
+No judged rows exist yet: the four category scores and overall require the pinned judge, which requires `ANTHROPIC_API_KEY`, and no champion is marked until the first gated run. The columns that do not depend on the judge are recorded below from the first full local run of the eval set (run `rag-20260809T125036Z`, 51 questions, Qwen2.5-7B-Instruct Q4_K_M on CPU via llama.cpp; details and conditions in `docs/findings/m5-serving.md`).
+
+| Variant | Lookup | Cross-ref | Synthesis | Refusal | Overall | Hit@5 | MRR | p50 latency | Cost per query |
+|---|---|---|---|---|---|---|---|---|---|
+| RAG (local) | awaits judge | awaits judge | awaits judge | awaits judge | awaits judge | 0.564 | 0.455 | 139 s under eval load, 60.5 s interactive | $0 marginal; $0.0055 at api rates |
+
+The judged columns fill from the same recorded run the day the key exists; collection and scoring are separate passes, so no answers need regenerating.
