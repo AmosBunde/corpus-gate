@@ -13,6 +13,7 @@ services:
       MODEL_BACKEND: ${MODEL_BACKEND:-local}
       QDRANT_URL: http://vectordb:6333
       LLM_URL: http://llm:8080
+      CORPUSGATE_API_TOKEN: ${CORPUSGATE_API_TOKEN:-change-me}
     depends_on:
       - vectordb
       - llm
@@ -35,17 +36,17 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
 
-  # Milestone M0 stub. Milestone M2 replaces this service with the
-  # llama.cpp server image plus the quantized base model, keeping the
-  # service name and port so the API needs no change:
-  #   image: ghcr.io/ggml-org/llama.cpp:server
-  #   command: ["-m", "/models/qwen2.5-7b-instruct-q4_k_m.gguf", "--port", "8080"]
-  #   volumes: ["./models:/models"]
+  # The pinned local runtime. Fetch the model once with
+  # make fetch-model; the split GGUF loads from part one.
   llm:
-    image: python:3.12-slim
-    command: ["python", "/stub/llm_stub.py"]
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command:
+      [
+        "-m", "/models/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
+        "--port", "8080", "--host", "0.0.0.0", "--ctx-size", "4096",
+      ]
     volumes:
-      - ./docker/llm_stub.py:/stub/llm_stub.py:ro
+      - ./models:/models:ro
     ports:
       - "${LLM_PORT:-8080}:8080"
 
