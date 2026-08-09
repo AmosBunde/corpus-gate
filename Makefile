@@ -69,6 +69,11 @@ scoreboard:
 
 # ---- Ingestion and variants (milestones M2 to M4) -----------------------
 
+fetch-model:
+	mkdir -p models
+	curl -L -o models/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf"
+	curl -L -o models/qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf"
+
 fetch-corpus:
 	$(PYTHON) -m corpusgate.ingest.fetch --manifest corpus/manifest.json --dest corpus/raw
 
