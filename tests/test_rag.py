@@ -3,7 +3,12 @@
 import json
 
 from corpusgate.evals import runner
-from corpusgate.evals.rag import ANSWER_SCHEMA, BaseVariant, RagVariant
+from corpusgate.evals.rag import (
+    ANSWER_SCHEMA,
+    BaseVariant,
+    LocalAnswerBackend,
+    RagVariant,
+)
 
 
 class FakeBackend:
@@ -83,3 +88,50 @@ def test_rag_runs_under_the_runner(tmp_path) -> None:
 
 def test_answer_schema_shape() -> None:
     assert set(ANSWER_SCHEMA["required"]) == {"answer", "citations", "refused"}
+
+
+class ScriptedTransport:
+    """Stands in for the httpx client; each entry is one server response body."""
+
+    def __init__(self, contents: list[str]):
+        self._contents = list(contents)
+        self.calls = 0
+
+    def post(self, url, json=None):
+        self.calls += 1
+        content = self._contents.pop(0)
+
+        class Response:
+            def raise_for_status(self):
+                pass
+
+            def json(self):
+                return {
+                    "choices": [{"message": {"content": content}}],
+                    "usage": {"prompt_tokens": 50, "completion_tokens": 10},
+                }
+
+        return Response()
+
+
+def _local_backend(transport: ScriptedTransport) -> LocalAnswerBackend:
+    backend = LocalAnswerBackend(url="http://fake:0")
+    backend._http = transport
+    return backend
+
+
+def test_local_backend_retries_an_empty_completion_once() -> None:
+    good = json.dumps({"answer": "ok", "citations": [], "refused": False})
+    transport = ScriptedTransport(["", good])
+    payload, prompt_tokens, completion_tokens = _local_backend(transport).complete("q")
+    assert transport.calls == 2
+    assert payload["answer"] == "ok"
+    assert (prompt_tokens, completion_tokens) == (50, 10)
+
+
+def test_local_backend_degrades_to_refusal_after_two_failures() -> None:
+    transport = ScriptedTransport(["", "not json either"])
+    payload, _, _ = _local_backend(transport).complete("q")
+    assert transport.calls == 2
+    assert payload["refused"] is True
+    assert "JSONDecodeError" in payload["answer"]

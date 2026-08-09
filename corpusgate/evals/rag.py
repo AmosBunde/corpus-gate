@@ -113,23 +113,37 @@ class LocalAnswerBackend:
         self.max_tokens = max_tokens
 
     def complete(self, prompt: str, schema: dict | None = None) -> tuple[dict, int, int]:
-        response = self._http.post(
-            f"{self.url}/v1/chat/completions",
-            json={
-                "messages": [{"role": "user", "content": prompt}],
-                "max_tokens": self.max_tokens,
-                "response_format": {"type": "json_object"},
-            },
-        )
-        response.raise_for_status()
-        body = response.json()
-        text = body["choices"][0]["message"]["content"]
-        usage = body.get("usage", {})
-        return (
-            json.loads(text),
-            int(usage.get("prompt_tokens", 0)),
-            int(usage.get("completion_tokens", 0)),
-        )
+        # A single unusable response must not destroy a long eval run, so an
+        # empty or malformed completion gets one retry and then degrades to a
+        # refusal shaped payload that the run records like any other refusal.
+        last_error = "no attempt made"
+        prompt_tokens = completion_tokens = 0
+        for attempt in range(2):
+            try:
+                response = self._http.post(
+                    f"{self.url}/v1/chat/completions",
+                    json={
+                        "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": self.max_tokens,
+                        "response_format": {"type": "json_object"},
+                    },
+                )
+                response.raise_for_status()
+                body = response.json()
+                text = body["choices"][0]["message"]["content"]
+                usage = body.get("usage", {})
+                prompt_tokens = int(usage.get("prompt_tokens", 0))
+                completion_tokens = int(usage.get("completion_tokens", 0))
+                return json.loads(text), prompt_tokens, completion_tokens
+            except Exception as error:  # noqa: BLE001 - any transport or parse failure retries
+                last_error = f"{type(error).__name__}: {error}"
+                print(f"local backend attempt {attempt + 1} failed ({last_error})")
+        fallback = {
+            "answer": f"The local model returned no usable response ({last_error}).",
+            "citations": [],
+            "refused": True,
+        }
+        return fallback, prompt_tokens, completion_tokens
 
 
 def get_backend(kind: str | None = None):
