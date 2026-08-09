@@ -8,6 +8,7 @@ endpoint emits status events and then the answer as server-sent
 events; per-request latency and token counts ride every response.
 """
 
+import hmac
 import json
 import os
 import time
@@ -55,7 +56,7 @@ def require_token(request: Request) -> None:
     if not expected:
         raise HTTPException(503, "CORPUSGATE_API_TOKEN is not configured on the server")
     header = request.headers.get("authorization", "")
-    if header != f"Bearer {expected}":
+    if not hmac.compare_digest(header.encode(), f"Bearer {expected}".encode()):
         raise HTTPException(401, "missing or invalid bearer token")
 
 

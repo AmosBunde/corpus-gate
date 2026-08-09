@@ -2,10 +2,10 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from test_serve import FakeVariant, fake_lookup
 
 from corpusgate.serve import metrics
 from corpusgate.serve.app import create_app
-from test_serve import FakeVariant, fake_lookup
 
 
 @pytest.fixture()
