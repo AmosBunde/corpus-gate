@@ -8,6 +8,7 @@ endpoint emits status events and then the answer as server-sent
 events; per-request latency and token counts ride every response.
 """
 
+import hmac
 import json
 import os
 import time
@@ -19,6 +20,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 import corpusgate
+from corpusgate.serve import metrics
 
 
 class QueryRequest(BaseModel):
@@ -54,7 +56,7 @@ def require_token(request: Request) -> None:
     if not expected:
         raise HTTPException(503, "CORPUSGATE_API_TOKEN is not configured on the server")
     header = request.headers.get("authorization", "")
-    if header != f"Bearer {expected}":
+    if not hmac.compare_digest(header.encode(), f"Bearer {expected}".encode()):
         raise HTTPException(401, "missing or invalid bearer token")
 
 
@@ -101,7 +103,7 @@ def create_app() -> FastAPI:
                     "passage": payload.get("text", ""),
                 }
             )
-        return {
+        response = {
             "request_id": uuid.uuid4().hex,
             "answer": result.answer,
             "refused": result.refused,
@@ -110,6 +112,23 @@ def create_app() -> FastAPI:
             "prompt_tokens": result.prompt_tokens,
             "completion_tokens": result.completion_tokens,
         }
+        metrics.append_record(
+            {
+                "request_id": response["request_id"],
+                "variant": getattr(variant, "name", "unknown"),
+                "backend": os.environ.get("MODEL_BACKEND", "local"),
+                "latency_ms": latency_ms,
+                "prompt_tokens": result.prompt_tokens,
+                "completion_tokens": result.completion_tokens,
+                "refused": result.refused,
+                "citations": len(citations),
+            }
+        )
+        return response
+
+    @app.get("/metrics", dependencies=[Depends(require_token)])
+    def metrics_endpoint() -> dict:
+        return metrics.aggregate()
 
     @app.post("/query", dependencies=[Depends(require_token)])
     def query(body: QueryRequest) -> dict:

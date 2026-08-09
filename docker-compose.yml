@@ -13,7 +13,7 @@ services:
       MODEL_BACKEND: ${MODEL_BACKEND:-local}
       QDRANT_URL: http://vectordb:6333
       LLM_URL: http://llm:8080
-      CORPUSGATE_API_TOKEN: ${CORPUSGATE_API_TOKEN:-change-me}
+      CORPUSGATE_API_TOKEN: ${CORPUSGATE_API_TOKEN:-}
     depends_on:
       - vectordb
       - llm
